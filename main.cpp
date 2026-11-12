@@ -1,4 +1,6 @@
 #include <Novice.h>
+
+//test
 enum Sceen
 {
 	TITLE,
