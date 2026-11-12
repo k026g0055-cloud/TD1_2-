@@ -8,6 +8,8 @@ enum Sceen
 };
 
 
+
+
 const char kWindowTitle[] = "LC1C_09_シミズ_イツキ";
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
