@@ -7,20 +7,11 @@ enum Sceen
 	PLAY
 };
 
-
-
-
 const char kWindowTitle[] = "LC1C_09_シミズ_イツキ";
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	// ライブラリの初期化
 	Novice::Initialize(kWindowTitle, 1280, 720);
-
-	HWND gameWindow = GetActiveWindow();
-
-	LONG_PTR windowStyle = GetWindowLongPtr(gameWindow, GWL_STYLE);
-	RECT windowRect = {};
-	GetWindowRect(gameWindow, &windowRect);
 
 	bool isFullScreen = false;
 
@@ -42,68 +33,23 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		if (keys[DIK_SPACE] && !preKeys[DIK_SPACE])
 		{
+			isFullScreen = !isFullScreen;
 
-
-			if (!isFullScreen)
+			if (isFullScreen)
 			{
-				GetWindowRect(gameWindow, &windowRect);
-
-				SetWindowLongPtr(
-					gameWindow,
-					GWL_STYLE,
-					WS_POPUP | WS_VISIBLE
-				);
-
-				HMONITOR monitor = MonitorFromWindow(
-					gameWindow,
-					MONITOR_DEFAULTTONEAREST
-				);
-
-				MONITORINFO monitorInfo = {};
-				monitorInfo.cbSize = sizeof(MONITORINFO);
-				GetMonitorInfo(monitor, &monitorInfo);
-
-				SetWindowPos(
-					gameWindow,
-					HWND_TOP,
-					monitorInfo.rcMonitor.left,
-					monitorInfo.rcMonitor.top,
-					monitorInfo.rcMonitor.right - monitorInfo.rcMonitor.left,
-					monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top,
-					SWP_FRAMECHANGED | SWP_SHOWWINDOW
-				);
-
-				isFullScreen = true;
+				Novice::SetWindowMode(kFullscreen);
 			}
 			else
 			{
-				SetWindowLongPtr(
-					gameWindow,
-					GWL_STYLE,
-					windowStyle
-				);
-
-				SetWindowPos(
-					gameWindow,
-					HWND_NOTOPMOST,
-					windowRect.left,
-					windowRect.top,
-					windowRect.right - windowRect.left,
-					windowRect.bottom - windowRect.top,
-					SWP_FRAMECHANGED | SWP_SHOWWINDOW
-				);
-
-				isFullScreen = false;
+				Novice::SetWindowMode(kWindowed);
 			}
 		}
-
 
 		switch (currentSceen)
 		{
 		case TITLE:
 		{
-			//pull request test
-			
+
 
 			break;
 
@@ -116,6 +62,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		}
 
 		}
+
 
 		///
 		/// ↑更新処理ここまで

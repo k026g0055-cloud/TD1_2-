@@ -188,6 +188,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClCompile Include="Boss.cpp" />
     <ClCompile Include="C:\KamataEngine\Adapter\Novice.cpp" />
+    <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
   </ItemGroup>
@@ -220,6 +221,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="C:\KamataEngine\DirectXGame\input\Input.h" />
     <ClInclude Include="C:\KamataEngine\DirectXGame\scene\GameScene.h" />
     <ClInclude Include="C:\KamataEngine\Adapter\Novice.h" />
+    <ClInclude Include="InputManager.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Vector2.h" />
   </ItemGroup>
