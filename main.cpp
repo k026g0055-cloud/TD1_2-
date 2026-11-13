@@ -1,6 +1,11 @@
 #include <Novice.h>
+#include "InputManager.h"
+#include "Player.h"
 
-//test
+#include <Xinput.h>
+
+#pragma comment(lib, "Xinput.lib")
+
 enum Sceen
 {
 	TITLE,
@@ -15,6 +20,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	bool isFullScreen = false;
 
+	// 入力管理
+	InputManager input;
+	input.Initialize();
+
+	// プレイヤー
+	Player player;
+	player.Initialize();
 
 	// キー入力結果を受け取る箱
 	char keys[256] = { 0 };
@@ -27,11 +39,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		// フレームの開始
 		Novice::BeginFrame();
 
+		input.Update();
+
+
 		// キー入力を受け取る
 		memcpy(preKeys, keys, 256);
 		Novice::GetHitKeyStateAll(keys);
 
-		if (keys[DIK_SPACE] && !preKeys[DIK_SPACE])
+		if (keys[DIK_F11] && !preKeys[DIK_F11])
 		{
 			isFullScreen = !isFullScreen;
 
@@ -49,14 +64,20 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		{
 		case TITLE:
 		{
-
-
+			Novice::ScreenPrintf(10, 10, "title");
+			Novice::ScreenPrintf(10, 25, "space");
+			
+			if (keys[DIK_SPACE] && !preKeys[DIK_SPACE])
+			{
+				currentSceen = PLAY;
+			}
 			break;
 
 		}
 		case PLAY:
 		{
-
+			player.Update(input);
+			player.Draw();
 
 			break;
 		}
