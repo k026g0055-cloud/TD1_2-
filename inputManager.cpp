@@ -175,3 +175,6 @@ bool InputManager::IsKeyTrigger(int key) const
 
 	return keys_[key] && !preKeys_[key];
 }
+
+
+
