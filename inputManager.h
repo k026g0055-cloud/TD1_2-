@@ -1,6 +1,5 @@
 #pragma once
 #include <Novice.h>
-#include <dinput.h>
 #include "Vector2.h"
 
 class InputManager

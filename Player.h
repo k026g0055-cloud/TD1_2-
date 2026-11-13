@@ -3,6 +3,8 @@
 class Player
 {
 public:
+	void Move();
+
 
 private:
 	Vector2 position_;
