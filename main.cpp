@@ -2,6 +2,10 @@
 #include "InputManager.h"
 #include "Player.h"
 
+#include <Xinput.h>
+
+#pragma comment(lib, "Xinput.lib")
+
 enum Sceen
 {
 	TITLE,
@@ -36,6 +40,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		Novice::BeginFrame();
 
 		input.Update();
+
 
 		// キー入力を受け取る
 		memcpy(preKeys, keys, 256);
