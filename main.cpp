@@ -102,6 +102,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		{
 			Novice::ScreenPrintf(10, 10, "play");
 			player.Update(input,map);
+			player.Update(input, map);
 			Vector2 PlayerPosition = player.GetPosition();
 
 			int playerTileX = static_cast<int>(PlayerPosition.x) / kTileSize;
@@ -116,6 +117,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			if (playerTileX >= kMapWidth - 4 &&
 				playerTileY <= 3) {
 				currentSceen = BOSS;
+				player.SetPosition({ 640.0f,620.0f });
 				break;
 			}
 
@@ -139,18 +141,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			Novice::ScreenPrintf(10, 10, "boss");
 
 			player.Update(input,map);
+			player.Update(input, map);
 			camera.Update(player.GetPosition());
 			boss.Update();
 
-			Vector2 PlayerPosition = player.GetPosition();
-			int playerTileX = static_cast<int>(PlayerPosition.x) / kTileSize;
-			int playerTileY = static_cast<int>(PlayerPosition.y) / kTileSize;
-
-			if (playerTileX >= kMapWidth - 4 &&
-				playerTileY <= 3) {
-				player.SetPosition({ 640.0f,620.0f });
-				currentSceen = BOSS;
-				break;
 
 			}
 			
@@ -183,6 +177,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 			map.Debug(camera);
 			blue_boss.Draw();
+			map.Debug(camera);
+			boss.Draw(camera);
 			player.Draw(camera);
 
 			break;

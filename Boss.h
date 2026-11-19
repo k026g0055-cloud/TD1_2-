@@ -1,5 +1,8 @@
 #pragma once
 #include "Vector2.h"
+#include "GameConfig.h"
+
+class Camera;
 
 class Boss
 {
@@ -15,13 +18,16 @@ public:
 
 	Boss();
 	void Update();
-	void Draw();
+	void Draw(const Camera& camera);
 
 private:
 	void Warp();
 	void FireRadialBullets();
 
-	Vector2 position_;
+	Vector2 position_ = {
+		25.0f*kTileSize,
+		5.0f * kTileSize
+	};
 	float radius_;
 
 	int warpTimer_;
