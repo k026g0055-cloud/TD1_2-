@@ -11,7 +11,6 @@ public:
     void Update();
 
     Vector2 GetMoveDirection() const;
-    Vector2 GetAimDirection() const;
 
     bool IsControllerConnected() const;
 
