@@ -84,7 +84,7 @@ void Pink::UpdateState() {
 	case State::FlameThrower:
 		//2秒間火炎放射
 		if (state_.timer >= 120) {
-			ChangeState(State::Hover)
+			ChangeState(State::Hover);
 		}
 	}
 
