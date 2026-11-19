@@ -1,4 +1,5 @@
 ﻿#include "Boss.h"
+#include "Camera.h"
 #include <Novice.h>
 #include <cmath>
 #include <cstdlib>
@@ -89,11 +90,16 @@ void Boss::FireRadialBullets() {
 	}
 }
 
-void Boss::Draw() {
+void Boss::Draw(const Camera& camera) {
+
+	//ボスのworld座標をScreen座標に変換
+	Vector2 bossScreenPosition =
+		camera.WorldToScreen(position_);
+
 	//ボス
 	Novice::DrawEllipse(
-		static_cast<int>(position_.x),
-		static_cast<int>(position_.y),
+		static_cast<int>(bossScreenPosition.x),
+		static_cast<int>(bossScreenPosition.y),
 		static_cast<int>(radius_),
 		static_cast<int>(radius_),
 		0.0f,
@@ -103,16 +109,21 @@ void Boss::Draw() {
 
 	//弾
 	for (int i = 0;i < kMaxBullets;i++) {
-		if (bullets_[i].isActive) {
-			Novice::DrawEllipse(
-				static_cast<int>(bullets_[i].position.x),
-				static_cast<int>(bullets_[i].position.y),
-				static_cast<int>(bullets_[i].radius),
-				static_cast<int>(bullets_[i].radius),
-				0.0f,
-				WHITE,
-				kFillModeSolid
-			);
+		if (!bullets_[i].isActive) {
+			continue;
 		}
+
+		Vector2 bulletScreenPosition =
+			camera.WorldToScreen(bullets_[i].position);
+
+		Novice::DrawEllipse(
+			static_cast<int>(bulletScreenPosition.x),
+			static_cast<int>(bulletScreenPosition.y),
+			static_cast<int>(bullets_[i].radius),
+			static_cast<int>(bullets_[i].radius),
+			0.0f,
+			WHITE,
+			kFillModeSolid
+		);
 	}
 }

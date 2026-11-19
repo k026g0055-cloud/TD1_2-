@@ -10,7 +10,9 @@ public:
     void Initialize();
 
     void Draw(const Camera& camera) const;
+    void DrawBoss(const Camera& camera) const;
     void Debug(const Camera& camera)const;
+    void DebugBoss(const Camera& camera)const;
 
     // 指定したマスが壁かどうか
     bool IsWall(int x, int y) const;
@@ -21,6 +23,9 @@ public:
     // マップのサイズを取得
     static int GetWidth();
     static int GetHeight();
+
+	static int GetBossWidth();
+    static int GetBossHeight();
 
 private:
     enum TileType
