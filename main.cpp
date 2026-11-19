@@ -151,7 +151,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		{
 			Novice::ScreenPrintf(10, 10, "boss");
 
-			// QTEを開始したフレームか
 			bool qteStarted = false;
 
 			// QTE開始処理
@@ -172,35 +171,47 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 					qteStarted = true;
 				}
 			}
-			player.Update(input,map);
-			player.Update(input, map);
-			camera.Update(player.GetPosition());
-			boss.Update();
 
-
-			// QTEの更新
+			// QTE更新
 			if (qte.IsPlaying())
 			{
 				if (!qteStarted)
 				{
 					qte.Update(input);
 				}
-
-				// 初心者QTEは移動可能
-				if (qte.GetMode() == QTE_BEGINNER)
-				{
-					player.Update(input, map);
-				}
 			}
-			else
+
+			// 移動処理
+			if (!qte.IsPlaying() ||
+				qte.GetMode() == QTE_BEGINNER)
 			{
-				// 通常時は移動可能
 				player.Update(input, map);
 			}
-			
+
+			// カメラ更新
+			camera.Update(player.GetPosition());
+
+			// ボス更新
+			boss.Update();
+
+			// 描画処理
 			map.Debug(camera);
 			boss.Draw(camera);
 			player.Draw(camera);
+
+			// QTE操作説明
+			Novice::ScreenPrintf(
+				10, 200,
+				"DPAD LEFT : BEGINNER"
+			);
+
+			Novice::ScreenPrintf(
+				10, 220,
+				"DPAD RIGHT : ADVANCED"
+			);
+
+			// QTEは最後に描画
+			qte.Draw();
 
 			break;
 		}
@@ -227,7 +238,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 			map.Debug(camera);
 			blue_boss.Draw();
-			map.Debug(camera);
 			boss.Draw(camera);
 			player.Draw(camera);
 

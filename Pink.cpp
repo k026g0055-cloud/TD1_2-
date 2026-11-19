@@ -55,7 +55,7 @@ void Pink::UpdateState() {
 			case 3:
 				ChangeState(State::Strike);
 				break;
-			case4:
+			case 4:
 				ChangeState(State::Barrier);
 				break;
 			}
@@ -88,4 +88,10 @@ void Pink::UpdateState() {
 		}
 	}
 
+}
+
+void Pink::DrawAttack(const Camera& camera)
+{
+	// 攻撃の描画処理
+	(void)camera;
 }
