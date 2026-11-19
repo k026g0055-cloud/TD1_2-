@@ -14,10 +14,14 @@ Pink::Pink() {
 }
 
 void Pink::Update(Vector2 playerPosition) {
-	if (state_.current != State::Stunned) {
-		Boss::Update();
-	}
+	//先に現在の特殊攻撃状態を更新
 	UpdateState(playerPosition);
+
+	//Hover中だけワープと全方位弾を許可
+	bool canUseCommonAttack =
+		state_.current == State::Hover;
+	//弾の移動処理自体は常に実行される
+	Boss::Update(canUseCommonAttack);
 }
 
 void Pink::Draw(const Camera& camera) {

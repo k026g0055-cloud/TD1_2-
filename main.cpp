@@ -1,5 +1,7 @@
 #include <Novice.h>
 #include <Xinput.h>
+#include <cstdlib>
+#include <ctime>
 
 #include "InputManager.h"
 #include "Player.h"
@@ -29,6 +31,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	Novice::Initialize(kWindowTitle, kWindowWidth, kWindowHeight);
 
 	bool isFullScreen = false;
+
+	srand(static_cast<unsigned int>(time(nullptr)));
 
 	// 入力管理
 	InputManager input;

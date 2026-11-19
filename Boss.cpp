@@ -7,6 +7,15 @@
 
 namespace {
 	const float kPi = 3.14f;
+
+	int randomFrame(int minSecond, int maxSecond) {
+		int minFrame = minSecond * 60;
+		int maxFrame = maxSecond * 60;
+
+		return minFrame +
+			rand() % (maxFrame - minFrame + 1);
+	}
+
 	const int kScreenWidth = 1280;
 	const int kScreenHeight = 720;
 }
@@ -18,8 +27,8 @@ Boss::Boss() {
 	};
 	radius_ = 30.0f;
 
-	warpTimer_ = 180;	// ワープタイマー
-	attackTimer_ = 120;	// 攻撃タイマー
+	warpTimer_ = randomFrame(5, 9);
+	attackTimer_ = randomFrame(4, 7);
 
 	for (int i = 0;i < kMaxBullets;i++) {
 		bullets_[i].position = {};
@@ -35,13 +44,13 @@ void Boss::Update(bool canUseCommonAttack) {
 		warpTimer_--;
 		if (warpTimer_ < -0) {
 			Warp();
-			warpTimer_ = 180;
+			warpTimer_ = randomFrame(5, 9);
 		}
 
 		attackTimer_--;
 		if (attackTimer_ <= 0) {
 			FireRadialBullets();
-			attackTimer_ = 120;
+			attackTimer_ = randomFrame(4,7);
 		}
 	}
 
