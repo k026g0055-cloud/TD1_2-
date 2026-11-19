@@ -8,7 +8,7 @@ class Pink : public Boss
 public:
 	Pink();
 
-	void Update();
+	void Update(Vector2 playerPosition);
 	void Draw(const Camera& camera);
 
 private:
@@ -36,10 +36,18 @@ private:
 		bool isActive = false;
 	};
 
-	void ChangeState(State nextState);
-	void UpdateState();
-	void DrawAttack(const Camera& camera);
+	struct BeamDate {
+		Vector2 direction = { 0.0f,1.0f };
+		float length = 2000.0f;
+		int halfWidth = 12;
+	};
 
+	void ChangeState(State nextState);
+	void DrawAttack(const Camera& camera);
+	void PrepareBeam(Vector2 playerPosition);
+	void UpdateState(Vector2 playerPosition);
+
+	BeamDate beam_;
 	StateData state_;
 	BarrierData barrier_;
 };

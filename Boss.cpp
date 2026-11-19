@@ -1,4 +1,6 @@
 ﻿#include "Boss.h"
+#include "Camera.h"
+#include "PINK.h"
 #include <Novice.h>
 #include <cmath>
 #include <cstdlib>
@@ -10,7 +12,10 @@ namespace {
 }
 
 Boss::Boss() {
-	position_ = { 640.0f,150.0f };
+	position_ = { 
+		25.0f* kTileSize ,
+		5.0f* kTileSize
+	};
 	radius_ = 30.0f;
 
 	warpTimer_ = 180;	// ワープタイマー
@@ -23,13 +28,21 @@ Boss::Boss() {
 		bullets_[i].isActive = false;
 	}
 }
-void Boss::Update() {
+void Boss::Update(bool canUseCommonAttack) {
 
-	//ワープまでの時間を減らす
-	warpTimer_--;
-	if (warpTimer_ <= 0) {
-		Warp();
-		warpTimer_ = 180;
+	//Hover中だけワープと全方位弾を更新
+	if (canUseCommonAttack) {
+		warpTimer_--;
+		if (warpTimer_ < -0) {
+			Warp();
+			warpTimer_ = 180;
+		}
+
+		attackTimer_--;
+		if (attackTimer_ <= 0) {
+			FireRadialBullets();
+			attackTimer_ = 120;
+		}
 	}
 
 	//全方位弾発射の時間を減らす
@@ -39,7 +52,7 @@ void Boss::Update() {
 		attackTimer_ = 120;
 	}
 
-	//弾の移動
+	//発射済みの弾は、特殊攻撃中でも移動させる
 	for (int i = 0;i < kMaxBullets;i++) {
 		if (!bullets_[i].isActive) {
 			continue;
@@ -47,11 +60,13 @@ void Boss::Update() {
 		bullets_[i].position.x += bullets_[i].velocity.x;
 		bullets_[i].position.y += bullets_[i].velocity.y;
 
-		//画面外に出たら弾を消す
+		//画面外に行ったら消滅
 		if (bullets_[i].position.x<-bullets_[i].radius ||
-			bullets_[i].position.x>kScreenWidth + bullets_[i].radius ||
+			bullets_[i].position.x>
+			kBossMapWidth * kTileSize + bullets_[i].radius ||
 			bullets_[i].position.y<-bullets_[i].radius ||
-			bullets_[i].position.y>kScreenHeight + bullets_[i].radius) {
+			bullets_[i].position.y>
+			kBossMapHeight * kTileSize + bullets_[i].radius) {
 			bullets_[i].isActive = false;
 		}
 	}
@@ -89,11 +104,26 @@ void Boss::FireRadialBullets() {
 	}
 }
 
-void Boss::Draw() {
-	//ボス
+void Boss::ClearBullets() {
+	for (int i = 0;i < kMaxBullets;i++) {
+		bullets_[i].isActive = false;
+		bullets_[i].position = {};
+		bullets_[i].velocity = {};
+	}
+}
+
+Vector2 Boss::GetPosition() const {
+	return position_;
+}
+
+void Boss::Draw(const Camera& camera)
+{
+	Vector2 bossScreenPosition =
+		camera.WorldToScreen(position_);
+
 	Novice::DrawEllipse(
-		static_cast<int>(position_.x),
-		static_cast<int>(position_.y),
+		static_cast<int>(bossScreenPosition.x),
+		static_cast<int>(bossScreenPosition.y),
 		static_cast<int>(radius_),
 		static_cast<int>(radius_),
 		0.0f,
@@ -101,18 +131,25 @@ void Boss::Draw() {
 		kFillModeSolid
 	);
 
-	//弾
-	for (int i = 0;i < kMaxBullets;i++) {
-		if (bullets_[i].isActive) {
-			Novice::DrawEllipse(
-				static_cast<int>(bullets_[i].position.x),
-				static_cast<int>(bullets_[i].position.y),
-				static_cast<int>(bullets_[i].radius),
-				static_cast<int>(bullets_[i].radius),
-				0.0f,
-				WHITE,
-				kFillModeSolid
-			);
+	
+	for (int i = 0; i < kMaxBullets; i++)
+	{
+		if (!bullets_[i].isActive)
+		{
+			continue;
 		}
+
+		Vector2 bulletScreenPosition =
+			camera.WorldToScreen(bullets_[i].position);
+
+		Novice::DrawEllipse(
+			static_cast<int>(bulletScreenPosition.x),
+			static_cast<int>(bulletScreenPosition.y),
+			static_cast<int>(bullets_[i].radius),
+			static_cast<int>(bullets_[i].radius),
+			0.0f,
+			WHITE,
+			kFillModeSolid
+		);
 	}
 }

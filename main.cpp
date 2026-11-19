@@ -7,7 +7,8 @@
 #include "GameConfig.h"
 #include "Map.h"
 #include "Camera.h"
-#include "BLUE_BOSS.h"
+#include "Pink.h"
+//#include "BLUE_BOSS.h"
 
 #pragma comment(lib, "Xinput.lib")
 
@@ -16,7 +17,7 @@ enum Sceen
 	TITLE,
 	PLAY,
 	BOSS,
-	BLUE_BOSS,
+	PINK,
 	MENU
 };
 
@@ -39,10 +40,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	// ボス
 	Boss boss;
-	Blue_Boss blue_boss;
+	Pink pink;
 
 	// マップ
-	Map map;
+	static Map map;
 	map.Initialize();
 
 	// カメラ
@@ -79,7 +80,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		}
 
 		if ((input.IsKeyTrigger(DIK_ESCAPE) || input.IsButtonTrigger(XINPUT_GAMEPAD_BACK)) &&
-			(currentSceen == PLAY || currentSceen == BOSS)) {
+			(currentSceen == PLAY || currentSceen == BOSS || currentSceen == PINK)) {
 			currentSceen = MENU;
 		}
 		switch (currentSceen)
@@ -93,6 +94,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			if (input.IsKeyTrigger(DIK_SPACE) ||
 				input.IsButtonTrigger(XINPUT_GAMEPAD_A))
 			{
+				player.Initialize();
+				camera.Initialize(
+					static_cast<float>(map.GetWidth()),
+					static_cast<float>(map.GetHeight())
+				);
 				currentSceen = PLAY;
 			}
 			break;
@@ -114,21 +120,26 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 				playerTileX, playerTileY
 			);
 
-			if (playerTileX >= kMapWidth - 4 &&
-				playerTileY <= 3) {
-				currentSceen = BOSS;
-				break;
-			}
 
 			if (playerTileX >= kMapWidth - 4 &&
-				playerTileY <= kMapHeight - 4) {
-				player.SetPosition({ 640.0f,620.0f });
-				currentSceen = BLUE_BOSS;
+				playerTileY <= 3) {
+				camera.Initialize(
+					static_cast<float>(kBossMapWidth * kTileSize),
+					static_cast<float>(kBossMapHeight * kTileSize)
+				);
+
+				// ボスマップの中央下へ配置
+				player.SetPosition({
+					kBossMapWidth * kTileSize / 2.0f,
+					kBossMapHeight * kTileSize - 100.0f
+					});
+				currentSceen = PINK;
 				break;
 
 			}
 
 			player.Debug();
+			map.Debug(camera);
 			camera.Update(player.GetPosition());
 			player.Draw(camera);
 
@@ -138,7 +149,42 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		{
 			Novice::ScreenPrintf(10, 10, "boss");
 
+			player.Update(input,map);
+			player.ClampToArea(
+				static_cast<float>(kBossMapWidth * kTileSize),
+				static_cast<float>(kBossMapHeight * kTileSize)
+			);
+			camera.Update(player.GetPosition());
+			boss.Update();
+
+			Vector2 PlayerPosition = player.GetPosition();
+			int playerTileX = static_cast<int>(PlayerPosition.x) / kTileSize;
+			int playerTileY = static_cast<int>(PlayerPosition.y) / kTileSize;
+
+			if (playerTileX >= kMapWidth - 4 &&
+				playerTileY <= 3) {
+				player.SetPosition({ 640.0f,620.0f });
+				currentSceen = BOSS;
+				break;
+
+			}
+			
+			map.DebugBoss(camera);
+			boss.Draw(camera);
+			player.Draw(camera);
+
+			break;
+		}
+
+		/*case BLUE_BOSS:
+		{
+			Novice::ScreenPrintf(10, 10, "blue boss");
+
 			player.Update(input, map);
+			player.ClampToArea(
+				static_cast<float>(kBossMapWidth * kTileSize),
+				static_cast<float>(kBossMapHeight * kTileSize)
+			);
 			camera.Update(player.GetPosition());
 			blue_boss.Update();
 
@@ -155,6 +201,36 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 			map.Debug(camera);
 			boss.Draw(camera);
+			player.Draw(camera);
+
+			break;
+		}*/
+		case PINK:
+		{
+			Novice::ScreenPrintf(10, 10, "PINK");
+
+			player.Update(input, map);
+			player.ClampToArea(
+				static_cast<float>(kBossMapWidth * kTileSize),
+				static_cast<float>(kBossMapHeight * kTileSize)
+			);
+			camera.Update(player.GetPosition());
+			pink.Update(player.GetPosition());
+
+			Vector2 PlayerPosition = player.GetPosition();
+			int playerTileX = static_cast<int>(PlayerPosition.x) / kTileSize;
+			int playerTileY = static_cast<int>(PlayerPosition.y) / kTileSize;
+
+			if (playerTileX >= kMapWidth - 4 &&
+				playerTileY <= 3) {
+				player.SetPosition({ 640.0f,620.0f });
+				currentSceen = PINK;
+				break;
+
+			}
+
+			map.DebugBoss(camera);
+			pink.Draw(camera);
 			player.Draw(camera);
 
 			break;

@@ -93,6 +93,30 @@ void Player::Update(const InputManager& input, const Map& map)
     }
 }
 
+void Player::ClampToArea(float areaWidth, float areaHeight)
+{
+	const float halfWidth = size_.x / 2.0f;
+	const float halfHeight = size_.y / 2.0f;
+
+	if (position_.x < halfWidth)
+	{
+		position_.x = halfWidth;
+	}
+	else if (position_.x > areaWidth - halfWidth)
+	{
+		position_.x = areaWidth - halfWidth;
+	}
+
+	if (position_.y < halfHeight)
+	{
+		position_.y = halfHeight;
+	}
+	else if (position_.y > areaHeight - halfHeight)
+	{
+		position_.y = areaHeight - halfHeight;
+	}
+}
+
 
 void Player::Draw(const Camera& camera) const
 {

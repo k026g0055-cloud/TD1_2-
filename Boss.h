@@ -17,8 +17,12 @@ public:
 	};
 
 	Boss();
-	void Update();
+	void Update(bool canUseCommonAttack=true);
 	void Draw(const Camera& camera);
+
+protected:
+	void ClearBullets();
+	Vector2 GetPosition() const;
 
 private:
 	void Warp();
