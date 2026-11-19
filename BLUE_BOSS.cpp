@@ -5,7 +5,7 @@
 #include <cstdlib>
 
 
-//Pull確認用散歩怪異
+//Pull確認用
 namespace {
 	const float kPi = 3.14f;
 	const int kScreenWidth = 1280;

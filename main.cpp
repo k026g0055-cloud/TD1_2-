@@ -117,7 +117,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			if (playerTileX >= kMapWidth - 4 &&
 				playerTileY <= 3) {
 				currentSceen = BOSS;
-				player.SetPosition({ 640.0f,620.0f });
 				break;
 			}
 
@@ -131,7 +130,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 			player.Debug();
 			camera.Update(player.GetPosition());
-			map.Debug(camera);
 			player.Draw(camera);
 
 			break;
@@ -139,25 +137,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		case BOSS:
 		{
 			Novice::ScreenPrintf(10, 10, "boss");
-
-			player.Update(input,map);
-			player.Update(input, map);
-			camera.Update(player.GetPosition());
-			boss.Update();
-
-
-			}
-			
-			map.Debug(camera);
-			boss.Draw();
-			player.Draw(camera);
-
-			break;
-		}
-
-		case BLUE_BOSS:
-		{
-			Novice::ScreenPrintf(10, 10, "blue boss");
 
 			player.Update(input, map);
 			camera.Update(player.GetPosition());
@@ -173,10 +152,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 				currentSceen = BLUE_BOSS;
 				break;
 
-			}
 
-			map.Debug(camera);
-			blue_boss.Draw();
 			map.Debug(camera);
 			boss.Draw(camera);
 			player.Draw(camera);
