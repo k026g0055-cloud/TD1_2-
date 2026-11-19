@@ -14,8 +14,8 @@ Boss::Boss() {
 	position_ = { 640.0f,150.0f };
 	radius_ = 30.0f;
 
-	warpTimer_ = 180;
-	attackTimer_ = 120;
+	warpTimer_ = 180;	// ワープタイマー
+	attackTimer_ = 120;	// 攻撃タイマー
 
 	for (int i = 0;i < kMaxBullets;i++) {
 		bullets_[i].position = {};

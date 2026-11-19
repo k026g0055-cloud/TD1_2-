@@ -43,6 +43,9 @@
     <ClCompile Include="Map.cpp">
       <Filter>ソースファイル</Filter>
     </ClCompile>
+    <ClCompile Include="BLUE_BOSS.cpp">
+      <Filter>ソースファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C:\KamataEngine\DirectXGame\audio\Audio.h">
@@ -135,5 +138,10 @@
     <ClInclude Include="Boss.h">
       <Filter>ヘッダーファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="GameConfig.h" />
+    <ClInclude Include="InputManager.h" />
+    <ClInclude Include="Map.h" />
+    <ClInclude Include="BLUE_BOSS.h" />
   </ItemGroup>
 </Project>
