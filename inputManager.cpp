@@ -113,21 +113,6 @@ Vector2 InputManager::GetMoveDirection() const
     return move;
 }
 
-// 攻撃方向
-Vector2 InputManager::GetAimDirection() const
-{
-    if (!controllerConnected_)
-    {
-        return { 0.0f, 0.0f };
-    }
-
-    return GetStickDirection(
-        joystickState_.Gamepad.sThumbRX,
-        joystickState_.Gamepad.sThumbRY,
-        XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE
-    );
-}
-
 // 接続確認
 bool InputManager::IsControllerConnected() const
 {
