@@ -199,7 +199,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			}
 			
 			map.Debug(camera);
-			boss.Draw();
+			boss.Draw(camera);
 			player.Draw(camera);
 
 			break;
