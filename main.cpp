@@ -10,7 +10,7 @@
 #include "Map.h"
 #include "Camera.h"
 #include "Pink.h"
-//#include "BLUE_BOSS.h"
+#include "BLUE_BOSS.h"
 
 #pragma comment(lib, "Xinput.lib")
 
@@ -20,6 +20,7 @@ enum Sceen
 	PLAY,
 	BOSS,
 	PINK,
+	BLUE_BOSS,
 	MENU
 };
 
@@ -45,6 +46,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// ボス
 	Boss boss;
 	Pink pink;
+	Blue_Boss blue_boss;
 
 	// マップ
 	static Map map;
@@ -247,7 +249,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			break;
 		}
 
-		/*case BLUE_BOSS:
+		case BLUE_BOSS:
 		{
 			Novice::ScreenPrintf(10, 10, "blue boss");
 
@@ -268,7 +270,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 				player.SetPosition({ 640.0f,620.0f });
 				currentSceen = BLUE_BOSS;
 				break;
-
+			}
 
 			map.Debug(camera);
 			boss.Draw(camera);
@@ -288,13 +290,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			);
 
 			break;
-		}*/
+		}
 		case PINK:
 		{
 			Novice::ScreenPrintf(10, 10, "PINK");
 
 			player.Update(input, map);
 			player.ClampToArea(
+		
 				static_cast<float>(kBossMapWidth * kTileSize),
 				static_cast<float>(kBossMapHeight * kTileSize)
 			);
