@@ -10,6 +10,8 @@ public:
 
 	void Update(Vector2 playerPosition);
 	void Draw(const Camera& camera);
+	void DamageBarrier(int damage);
+	bool IsBarrierActive() const;
 
 private:
 	enum class State
@@ -20,7 +22,6 @@ private:
 		Beam,
 		FlameThrower,
 		Strike,
-		Barrier,
 		Stunned
 	};
 
@@ -34,6 +35,7 @@ private:
 	struct BarrierData {
 		int hp = 3;
 		bool isActive = false;
+		int animationTimer = 0;
 	};
 
 	struct BeamDate {
@@ -43,7 +45,9 @@ private:
 	};
 
 	void ChangeState(State nextState);
+	void ActivateBarrier();
 	void DrawAttack(const Camera& camera);
+	void DrawBarrier(const Camera& camera);
 	void PrepareBeam(Vector2 playerPosition);
 	void UpdateState(Vector2 playerPosition);
 

@@ -11,9 +11,14 @@ Pink::Pink() {
 
 	barrier_.hp = 3;
 	barrier_.isActive = false;
+	barrier_.animationTimer = 0;
 }
 
 void Pink::Update(Vector2 playerPosition) {
+	if (barrier_.isActive) {
+		barrier_.animationTimer++;
+	}
+
 	//先に現在の特殊攻撃状態を更新
 	UpdateState(playerPosition);
 
@@ -27,19 +32,44 @@ void Pink::Update(Vector2 playerPosition) {
 void Pink::Draw(const Camera& camera) {
 	Boss::Draw(camera);
 	DrawAttack(camera);
+	DrawBarrier(camera);
 }
 
 void Pink::ChangeState(State nextState) {
 	state_.current = nextState;
 	state_.timer = 0;
-	if (nextState == State::Barrier) {
-		barrier_.hp = 3;
-		barrier_.isActive = true;
-	}
 	if (nextState == State::Stunned) {
 		barrier_.isActive = false;
 		ClearBullets();
 	}
+}
+
+void Pink::ActivateBarrier() {
+	if (barrier_.isActive) {
+		return;
+	}
+
+	barrier_.hp = 3;
+	barrier_.isActive = true;
+	barrier_.animationTimer = 0;
+}
+
+void Pink::DamageBarrier(int damage) {
+	if (!barrier_.isActive || damage <= 0) {
+		return;
+	}
+
+	barrier_.hp -= damage;
+
+	if (barrier_.hp <= 0) {
+		barrier_.hp = 0;
+		barrier_.isActive = false;
+		ChangeState(State::Stunned);
+	}
+}
+
+bool Pink::IsBarrierActive() const {
+	return barrier_.isActive;
 }
 
 void Pink::PrepareBeam(Vector2 playerPosition) {
@@ -68,7 +98,8 @@ void Pink::UpdateState(Vector2 playerPosition) {
 	switch (state_.current) {
 	case State::Hover:
 		if (state_.timer >= 120) {
-			int attackNumber = rand() % 5;
+			const int attackCount = barrier_.isActive ? 4 : 5;
+			int attackNumber = rand() % attackCount;
 			switch (attackNumber)
 			{
 			case 0:
@@ -85,7 +116,8 @@ void Pink::UpdateState(Vector2 playerPosition) {
 				ChangeState(State::Strike);
 				break;
 			case 4:
-				ChangeState(State::Barrier);
+				ActivateBarrier();
+				state_.timer = 0;
 				break;
 			}
 		}
@@ -120,13 +152,6 @@ void Pink::UpdateState(Vector2 playerPosition) {
 		//打撃は短め
 		if (state_.timer >= 45) {
 			ChangeState(State::Hover);
-		}
-		break;
-	case State::Barrier:
-		//仮処理：4秒後にバリア破壊
-		//あとでプレイヤーの攻撃による破壊へ変更する
-		if (state_.timer >= 240){
-			ChangeState(State::Stunned);
 		}
 		break;
 	case State::Stunned:
@@ -243,11 +268,45 @@ void Pink::DrawAttack(const Camera& camera) {
 	case State::Strike:
 		Novice::ScreenPrintf(10, 80, "Boss State : Strike");
 		break;
-	case State::Barrier:
-		Novice::ScreenPrintf(10, 80, "Boss State : Barrier HP %d", barrier_.hp);
-		break;
 	case State::Stunned:
 		Novice::ScreenPrintf(10, 80, "Boss State : stunned");
 		break;
 	}
+}
+
+void Pink::DrawBarrier(const Camera& camera) {
+	if (!barrier_.isActive) {
+		return;
+	}
+
+	Vector2 bossScreenPosition =
+		camera.WorldToScreen(GetPosition());
+
+	int pulse = barrier_.animationTimer % 30;
+	if (pulse > 15) {
+		pulse = 30 - pulse;
+	}
+
+	const int baseRadius = 55 + pulse / 3;
+
+	for (int i = 0; i < barrier_.hp; i++) {
+		const int radius = baseRadius + i * 12;
+
+		Novice::DrawEllipse(
+			static_cast<int>(bossScreenPosition.x),
+			static_cast<int>(bossScreenPosition.y),
+			radius,
+			radius,
+			0.0f,
+			0xFF66FFFF,
+			kFillModeWireFrame
+		);
+	}
+
+	Novice::ScreenPrintf(
+		10,
+		100,
+		"Barrier HP : %d",
+		barrier_.hp
+	);
 }
