@@ -57,6 +57,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		static_cast<float>(map.GetHeight())
 	);
 
+	QTESystem qte;
+	qte.Initialize();
+
 	int currentSceen = TITLE;
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -110,6 +113,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		}
 		case PLAY:
 		{
+			//デバック用
+			if (input.IsButtonTrigger(XINPUT_GAMEPAD_RIGHT_THUMB))
+			{
+				currentSceen = BOSS;
+			}
+
 			Novice::ScreenPrintf(10, 10, "play");
 			player.Update(input,map);
 			player.Update(input, map);
@@ -149,6 +158,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 			break;
 		}
+
 		case BOSS:
 		{
 			Novice::ScreenPrintf(10, 10, "boss");
@@ -170,12 +180,69 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 				player.SetPosition({ 640.0f,620.0f });
 				currentSceen = BOSS;
 				break;
+			bool qteStarted = false;
 
+			// QTE開始処理
+			if (!qte.IsPlaying())
+			{
+				// 初心者QTE
+				if (input.IsKeyTrigger(DIK_1) ||
+					input.IsButtonTrigger(XINPUT_GAMEPAD_DPAD_LEFT))
+				{
+					qte.Start(QTE_BEGINNER);
+					qteStarted = true;
+				}
+				// 上級者QTE
+				else if (input.IsKeyTrigger(DIK_2) ||
+					input.IsButtonTrigger(XINPUT_GAMEPAD_DPAD_RIGHT))
+				{
+					qte.Start(QTE_ADVANCED);
+					qteStarted = true;
+				}
+			}
+
+			// QTE更新
+			if (qte.IsPlaying())
+			{
+				if (!qteStarted)
+				{
+					qte.Update(input);
+				}
 			}
 			
 			map.DebugBoss(camera);
+
+			// 移動処理
+			if (!qte.IsPlaying() ||
+				qte.GetMode() == QTE_BEGINNER)
+			{
+				player.Update(input, map);
+			}
+
+			// カメラ更新
+			camera.Update(player.GetPosition());
+
+			// ボス更新
+			boss.Update();
+
+			// 描画処理
+			map.Debug(camera);
 			boss.Draw(camera);
 			player.Draw(camera);
+
+			// QTE操作説明
+			Novice::ScreenPrintf(
+				10, 200,
+				"DPAD LEFT : BEGINNER"
+			);
+
+			Novice::ScreenPrintf(
+				10, 220,
+				"DPAD RIGHT : ADVANCED"
+			);
+
+			// QTEは最後に描画
+			qte.Draw();
 
 			break;
 		}
@@ -206,6 +273,19 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			map.Debug(camera);
 			boss.Draw(camera);
 			player.Draw(camera);
+
+			// QTEは最後に描画
+			qte.Draw();
+
+			Novice::ScreenPrintf(
+				10, 200,
+				"DPAD LEFT : BEGINNER"
+			);
+
+			Novice::ScreenPrintf(
+				10, 220,
+				"DPAD RIGHT : ADVANCED"
+			);
 
 			break;
 		}*/
@@ -239,6 +319,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 			break;
 		}
+
 		case MENU:
 		{
 			Novice::ScreenPrintf(540, 300, "MENU");

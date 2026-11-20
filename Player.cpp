@@ -67,29 +67,14 @@ void Player::Update(const InputManager& input, const Map& map)
         position_.y = nextY;
     }
 
-    // 右スティックの入力
-    Vector2 aim = input.GetAimDirection();
-
-    float aimLength = sqrtf(
-        aim.x * aim.x + aim.y * aim.y
+    float moveLength = sqrtf(
+        move.x * move.x + move.y * move.y
     );
 
-    if (aimLength > 0.01f)
+    if (moveLength > 0.01f)
     {
-        direction_.x = aim.x / aimLength;
-        direction_.y = aim.y / aimLength;
-    }
-    else
-    {
-        float moveLength = sqrtf(
-            move.x * move.x + move.y * move.y
-        );
-
-        if (moveLength > 0.01f)
-        {
-            direction_.x = move.x / moveLength;
-            direction_.y = move.y / moveLength;
-        }
+        direction_.x = move.x / moveLength;
+        direction_.y = move.y / moveLength;
     }
 }
 
