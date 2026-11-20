@@ -11,6 +11,7 @@
 #include "Camera.h"
 #include "Pink.h"
 #include "BLUE_BOSS.h"
+#include "QTESystem.h"
 
 #pragma comment(lib, "Xinput.lib")
 
@@ -182,6 +183,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 				player.SetPosition({ 640.0f,620.0f });
 				currentSceen = BOSS;
 				break;
+			}
 			bool qteStarted = false;
 
 			// QTE開始処理
@@ -303,6 +305,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			);
 			camera.Update(player.GetPosition());
 			pink.Update(player.GetPosition());
+
+			if (pink.IsBeamHit(
+				player.GetPosition(),
+				24.0f)) {
+				Novice::ScreenPrintf(
+					500, 100, "Beam HIT"
+				);
+			}
 
 			Vector2 PlayerPosition = player.GetPosition();
 			int playerTileX = static_cast<int>(PlayerPosition.x) / kTileSize;

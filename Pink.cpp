@@ -310,3 +310,69 @@ void Pink::DrawBarrier(const Camera& camera) {
 		barrier_.hp
 	);
 }
+
+bool Pink::IsBeamHit(
+	Vector2 playerPosition,
+	float playerRadius
+) const
+{
+	if (state_.current != State::Beam) {
+		return false;
+	}
+
+	Vector2 beamStart = GetPosition();
+
+	Vector2 beamEnd = {
+		beamStart.x + beam_.direction.x * beam_.length,
+		beamStart.y + beam_.direction.y * beam_.length
+	};
+
+	Vector2 beamVector = {
+		beamEnd.x - beamStart.x,
+		beamEnd.y - beamStart.y
+	};
+
+	Vector2 playerVector = {
+		playerPosition.x - beamStart.x,
+		playerPosition.y - beamStart.y
+	};
+
+	float beamLengthSquared =
+		beamVector.x * beamVector.x +
+		beamVector.y * beamVector.y;
+
+	if (beamLengthSquared <= 0.001f) {
+		return false;
+	}
+
+	float t =
+		(playerVector.x * beamVector.x +
+			playerVector.y * beamVector.y) /
+		beamLengthSquared;
+
+	if (t < 0.0f) {
+		t = 0.0f;
+	} else if (t > 1.0f) {
+		t = 1.0f;
+	}
+
+	Vector2 nearestPosition = {
+		beamStart.x + beamVector.x * t,
+		beamStart.y + beamVector.y * t
+	};
+
+	float distanceX =
+		playerPosition.x - nearestPosition.x;
+
+	float distanceY =
+		playerPosition.y - nearestPosition.y;
+
+	float hitRadius =
+		static_cast<float>(beam_.halfWidth) +
+		playerRadius;
+
+	return distanceX * distanceX +
+		distanceY * distanceY
+		<= hitRadius * hitRadius;
+}
+

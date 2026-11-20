@@ -12,6 +12,10 @@ public:
 	void Draw(const Camera& camera);
 	void DamageBarrier(int damage);
 	bool IsBarrierActive() const;
+	bool IsBeamHit(
+		Vector2 playerPosition,
+		float playerRadius
+	) const;
 
 private:
 	enum class State
