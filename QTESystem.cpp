@@ -317,6 +317,98 @@ const char* QTESystem::GetCommandText(
     }
 }
 
+
+void QTESystem::DrawCommandArrow(
+    QTECommand command,
+    int centerX,
+    int centerY,
+    unsigned int color
+) const
+{
+    int dx = 0;
+    int dy = 0;
+
+    switch (command)
+    {
+    case CMD_UP:
+        dy = -1;
+        break;
+
+    case CMD_DOWN:
+        dy = 1;
+        break;
+
+    case CMD_LEFT:
+        dx = -1;
+        break;
+
+    case CMD_RIGHT:
+        dx = 1;
+        break;
+
+    case CMD_UP_LEFT:
+        dx = -1;
+        dy = -1;
+        break;
+
+    case CMD_UP_RIGHT:
+        dx = 1;
+        dy = -1;
+        break;
+
+    case CMD_DOWN_LEFT:
+        dx = -1;
+        dy = 1;
+        break;
+
+    case CMD_DOWN_RIGHT:
+        dx = 1;
+        dy = 1;
+        break;
+
+    default:
+        return;
+    }
+
+    // 矢印の長さ
+    int length = 22;
+
+    // 矢印の先端
+    int endX = centerX + dx * length;
+    int endY = centerY + dy * length;
+
+    // 矢印の軸
+    Novice::DrawLine(
+        centerX, centerY,
+        endX, endY,
+        color
+    );
+
+    // 矢印の羽根
+    int wing = 9;
+
+    int backX = endX - dx * wing;
+    int backY = endY - dy * wing;
+
+    int sideX = -dy * wing;
+    int sideY = dx * wing;
+
+    Novice::DrawLine(
+        endX, endY,
+        backX + sideX,
+        backY + sideY,
+        color
+    );
+
+    Novice::DrawLine(
+        endX, endY,
+        backX - sideX,
+        backY - sideY,
+        color
+    );
+}
+
+
 // 描画
 void QTESystem::Draw() const
 {
@@ -398,13 +490,28 @@ void QTESystem::Draw() const
             kFillModeSolid
         );
 
-        Novice::ScreenPrintf(
-            x + 8, y + 20,
-            "%s",
-            GetCommandText(
-                commands_[currentSet_][i]
-            )
-        );
+        QTECommand command = commands_[currentSet_][i];
+
+        if (mode_ == QTE_ADVANCED)
+        {
+            // 上級者は矢印で表示
+            DrawCommandArrow(
+                command,
+                x + 55,
+                y + 30,
+                WHITE
+            );
+        }
+        else
+        {
+            // 初心者はXYABを表示
+            Novice::ScreenPrintf(
+                x + 50,
+                y + 20,
+                "%s",
+                GetCommandText(command)
+            );
+        }
     }
 
     // 制限時間ゲージ
