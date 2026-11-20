@@ -9,6 +9,7 @@ class Player
 public:
 	void Initialize();
 	void Update(const InputManager& input,const Map &map);
+	void ClampToArea(float areaWidth, float areaHeight);
 	Vector2 GetPosition() const;
 	void SetPosition(Vector2 position);
 	void Draw(const Camera& camera) const;

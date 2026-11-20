@@ -3,6 +3,7 @@
 
 #include <Novice.h>
 #include <cstdlib>
+#include <cmath>
 
 Pink::Pink() {
 	state_.current = State::Hover;
@@ -10,43 +11,102 @@ Pink::Pink() {
 
 	barrier_.hp = 3;
 	barrier_.isActive = false;
+	barrier_.animationTimer = 0;
 }
 
-void Pink::Update() {
-	//共通処理：ワープと全方位弾
-	Boss::Update();
-	UpdateState();
+void Pink::Update(Vector2 playerPosition) {
+	if (barrier_.isActive) {
+		barrier_.animationTimer++;
+	}
+
+	//先に現在の特殊攻撃状態を更新
+	UpdateState(playerPosition);
+
+	//Hover中だけワープと全方位弾を許可
+	bool canUseCommonAttack =
+		state_.current == State::Hover;
+	//弾の移動処理自体は常に実行される
+	Boss::Update(canUseCommonAttack);
 }
 
 void Pink::Draw(const Camera& camera) {
 	Boss::Draw(camera);
 	DrawAttack(camera);
+	DrawBarrier(camera);
 }
 
 void Pink::ChangeState(State nextState) {
 	state_.current = nextState;
 	state_.timer = 0;
-	if (nextState == State::Barrier) {
-		barrier_.hp = 3;
-		barrier_.isActive = true;
-	}
 	if (nextState == State::Stunned) {
 		barrier_.isActive = false;
+		ClearBullets();
 	}
 }
 
-void Pink::UpdateState() {
+void Pink::ActivateBarrier() {
+	if (barrier_.isActive) {
+		return;
+	}
+
+	barrier_.hp = 3;
+	barrier_.isActive = true;
+	barrier_.animationTimer = 0;
+}
+
+void Pink::DamageBarrier(int damage) {
+	if (!barrier_.isActive || damage <= 0) {
+		return;
+	}
+
+	barrier_.hp -= damage;
+
+	if (barrier_.hp <= 0) {
+		barrier_.hp = 0;
+		barrier_.isActive = false;
+		ChangeState(State::Stunned);
+	}
+}
+
+bool Pink::IsBarrierActive() const {
+	return barrier_.isActive;
+}
+
+void Pink::PrepareBeam(Vector2 playerPosition) {
+	Vector2 bossPosition = GetPosition();
+
+	Vector2 differnce = {
+		playerPosition.x - bossPosition.x,
+		playerPosition.y - bossPosition.y
+	};
+
+	float length = std::sqrt(
+		differnce.x * differnce.x +
+		differnce.y * differnce.y
+	);
+
+	if (length > 0.001f) {
+		beam_.direction.x = differnce.x / length;
+		beam_.direction.y = differnce.y / length;
+	} else {
+		beam_.direction = { 0.0f,1.0f };
+	}
+}
+
+void Pink::UpdateState(Vector2 playerPosition) {
 	state_.timer++;
 	switch (state_.current) {
 	case State::Hover:
 		if (state_.timer >= 120) {
-			int attackNumber = rand() % 5;
+			const int attackCount = barrier_.isActive ? 4 : 5;
+			int attackNumber = rand() % attackCount;
 			switch (attackNumber)
 			{
 			case 0:
 				ChangeState(State::Magma);
 				break;
 			case 1:
+				PrepareBeam(playerPosition);
 				ChangeState(State::BeamWarning);
 				break;
 			case 2:
@@ -56,7 +116,8 @@ void Pink::UpdateState() {
 				ChangeState(State::Strike);
 				break;
 			case 4:
-				ChangeState(State::Barrier);
+				ActivateBarrier();
+				state_.timer = 0;
 				break;
 			}
 		}
@@ -86,12 +147,166 @@ void Pink::UpdateState() {
 		if (state_.timer >= 120) {
 			ChangeState(State::Hover);
 		}
+		break;
+	case State::Strike:
+		//打撃は短め
+		if (state_.timer >= 45) {
+			ChangeState(State::Hover);
+		}
+		break;
+	case State::Stunned:
+		//バリア破壊後、3秒停止
+		if (state_.timer >= 180) {
+			ChangeState(State::Hover);
+		}
+		break;
 	}
-
 }
 
-void Pink::DrawAttack(const Camera& camera)
-{
-	// 攻撃の描画処理
+
+void Pink::DrawAttack(const Camera& camera) {
+	//cameraは攻撃エフェクトをworld座標から
+	//Screen座標へ変換するときに使用する
 	(void)camera;
+
+	switch (state_.current) {
+	case State::Hover:
+		Novice::ScreenPrintf(10, 80, "Boss State : Hover");
+		break;
+	case State::Magma:
+		Novice::ScreenPrintf(10, 80, "Boss State : Magma");
+		break;
+	case State::BeamWarning:
+	{
+		Novice::ScreenPrintf(10, 80, "Boss State ; Beam Warning");
+
+		Vector2 beamStart = GetPosition();
+		Vector2 beamEnd = {
+			beamStart.x + beam_.direction.x * beam_.length,
+			beamStart.y + beam_.direction.y * beam_.length
+		};
+
+		Vector2 startScreen =
+			camera.WorldToScreen(beamStart);
+		Vector2 endScreen =
+			camera.WorldToScreen(beamEnd);
+
+		//予告円
+		int circleRadius = 35 + state_.timer % 20;
+
+		Novice::DrawEllipse(
+			static_cast<int>(startScreen.x),
+			static_cast<int>(startScreen.y),
+			circleRadius,
+			circleRadius,
+			0.0f,
+			0xFF4444FF,
+			kFillModeWireFrame
+		);
+
+		Novice::DrawLine(
+			static_cast<int>(startScreen.x),
+			static_cast<int>(startScreen.y),
+			static_cast<int>(endScreen.x),
+			static_cast<int>(endScreen.y),
+			0xFF4444AA
+		);
+		break;
+	}
+	case State::Beam:
+	{
+		Novice::ScreenPrintf(10, 80, "Boss State : Beam");
+
+		Vector2 beamStart = GetPosition();
+
+		Vector2 beamEnd = {
+			beamStart.x + beam_.direction.x * beam_.length,
+			beamStart.y + beam_.direction.y * beam_.length
+		};
+
+		Vector2 startScreen =
+			camera.WorldToScreen(beamStart);
+		Vector2 endScreen =
+			camera.WorldToScreen(beamEnd);
+
+		//ビームに対して垂直な方向
+		Vector2 perpendicular = {
+			-beam_.direction.y,
+			beam_.direction.x
+		};
+		//複数の線を並べて太いビームにする
+		for (int offset = -beam_.halfWidth;
+			offset <= beam_.halfWidth;
+			offset++) {
+			float offsetX =
+				perpendicular.x * static_cast<float>(offset);
+			float offsetY =
+				perpendicular.y * static_cast<float>(offset);
+
+			Novice::DrawLine(
+				static_cast<int>(startScreen.x + offsetX),
+				static_cast<int>(startScreen.y + offsetY),
+				static_cast<int>(endScreen.x + offsetX),
+				static_cast<int>(endScreen.y + offsetY),
+				0xFF66CCFF
+			);
+		}
+		//中心を白くする
+		Novice::DrawLine(
+			static_cast<int>(startScreen.x),
+			static_cast<int>(startScreen.y),
+			static_cast<int>(endScreen.x),
+			static_cast<int>(endScreen.y),
+			WHITE
+		);
+
+		break;
+	}
+	case State::FlameThrower:
+		Novice::ScreenPrintf(10, 80, "Boss State : Flame Thrower");
+		break;
+	case State::Strike:
+		Novice::ScreenPrintf(10, 80, "Boss State : Strike");
+		break;
+	case State::Stunned:
+		Novice::ScreenPrintf(10, 80, "Boss State : stunned");
+		break;
+	}
+}
+
+void Pink::DrawBarrier(const Camera& camera) {
+	if (!barrier_.isActive) {
+		return;
+	}
+
+	Vector2 bossScreenPosition =
+		camera.WorldToScreen(GetPosition());
+
+	int pulse = barrier_.animationTimer % 30;
+	if (pulse > 15) {
+		pulse = 30 - pulse;
+	}
+
+	const int baseRadius = 55 + pulse / 3;
+
+	for (int i = 0; i < barrier_.hp; i++) {
+		const int radius = baseRadius + i * 12;
+
+		Novice::DrawEllipse(
+			static_cast<int>(bossScreenPosition.x),
+			static_cast<int>(bossScreenPosition.y),
+			radius,
+			radius,
+			0.0f,
+			0xFF66FFFF,
+			kFillModeWireFrame
+		);
+	}
+
+	Novice::ScreenPrintf(
+		10,
+		100,
+		"Barrier HP : %d",
+		barrier_.hp
+	);
 }
