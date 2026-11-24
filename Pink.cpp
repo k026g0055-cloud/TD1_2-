@@ -2,6 +2,7 @@
 #include "Camera.h"
 
 #include <Novice.h>
+#include <algorithm>
 #include <cstdlib>
 #include <cmath>
 
@@ -22,11 +23,7 @@ void Pink::Update(Vector2 playerPosition) {
 
 	UpdateState(playerPosition);
 	UpdateMovement();
-
-	bool canUseCommonAttack =
-		state_.current == State::Hover;
-
-	Boss::Update(canUseCommonAttack);
+	UpdateMagma();
 
 	if (barrier_.isActive) {
 		barrier_.animationTimer++;
@@ -46,6 +43,101 @@ void Pink::Draw(const Camera& camera) {
 	Boss::Draw(camera);
 	DrawAttack(camera);
 	DrawBarrier(camera);
+	DrawMagma(camera);
+}
+
+void Pink::SpawnMagma(Vector2 playerPosition) {
+	for (int i = 0;i < kMaxMagma;i++) {
+		if (magma_[i].isActive) {
+			continue;
+		}
+		float randomX =
+			static_cast<float>(rand() % 321 - 160);
+
+		float randomY =
+			static_cast<float>(rand() % 321 - 160);
+
+		Vector2 targetPosition = {
+			playerPosition.x + randomX,
+			playerPosition.y + randomY
+		};
+
+		const float margin = 48.0f;
+
+		targetPosition.x = std::clamp(
+			targetPosition.x,
+			margin,
+			static_cast<float>(
+				kBossMapWidth * kTileSize
+				) - margin
+		);
+
+		targetPosition.y = std::clamp(
+			targetPosition.y,
+			margin,
+			static_cast<float>(
+				kBossMapHeight * kTileSize
+				) - margin
+		);
+
+		magma_[i].startPosition = GetPosition();
+		magma_[i].targetPosition = targetPosition;
+		magma_[i].position = GetPosition();
+
+		magma_[i].radius = 24.0f;
+		magma_[i].flightTimer = 0;
+		magma_[i].flightTime = 60;
+		magma_[i].remainTimer = 180;
+
+		magma_[i].isActive = true;
+		magma_[i].islended = false;
+
+		break;
+	}
+}
+
+void Pink::UpdateMovement()
+{
+	// ビーム・打撃・スタン中は移動しない
+	if (state_.current == State::BeamWarning ||
+		state_.current == State::Beam ||
+		state_.current == State::Strike ||
+		state_.current == State::Stunned)
+	{
+		return;
+	}
+
+	moveTimer_--;
+
+	Vector2 position = GetPosition();
+
+	Vector2 difference = {
+		moveTarget_.x - position.x,
+		moveTarget_.y - position.y
+	};
+
+	float distance = std::sqrt(
+		difference.x * difference.x +
+		difference.y * difference.y
+	);
+
+	// 目的地へ到着、または移動時間切れ
+	if (distance <= moveSpeed_ ||
+		moveTimer_ <= 0)
+	{
+		SelectMoveTarget();
+		return;
+	}
+
+	Vector2 velocity = {
+		difference.x / distance * moveSpeed_,
+		difference.y / distance * moveSpeed_
+	};
+
+	position.x += velocity.x;
+	position.y += velocity.y;
+
+	SetPosition(position);
 }
 
 void Pink::ChangeState(State nextState) {
@@ -137,6 +229,11 @@ void Pink::UpdateState(Vector2 playerPosition) {
 		break;
 
 	case State::Magma:
+		if (state_.timer == 1 ||
+			(state_.timer <= 80 &&
+				state_.timer % 20 == 0)) {
+			SpawnMagma(playerPosition);
+		}
 		//マグマ攻撃
 		if (state_.timer >= 100) {
 			ChangeState(State::Hover);
@@ -409,4 +506,137 @@ void Pink::SelectMoveTarget() {
 	//次の目的地を選びなおすまで2~4秒
 	moveTimer_ =
 		120 + rand() % 121;
+}
+
+void Pink::UpdateMagma() {
+	for (int i = 0;i < kMaxMagma;i++) {
+		if (!magma_[i].isActive) {
+			continue;
+		}
+
+		if (!magma_[i].islended) {
+			magma_[i].flightTimer++;
+
+			float t =
+				static_cast<float>(
+					magma_[i].flightTimer
+					) /
+				static_cast<float>(
+					magma_[i].flightTimer
+					);
+
+			if (t > 1.0f) {
+				t = 1.0f;
+			}
+
+			magma_[i].position.x =
+				magma_[i].startPosition.x +
+				(
+					magma_[i].targetPosition.x -
+					magma_[i].startPosition.x
+					) * t;
+			if (magma_[i].flightTimer >=
+				magma_[i].flightTime) {
+				magma_[i].position =
+					magma_[i].targetPosition;
+				magma_[i].islended = true;
+			}
+		} else {
+			//着弾後3秒間残る処理
+			magma_[i].remainTimer--;
+
+			if (magma_[i].remainTimer <= 0) {
+				magma_[i].isActive = false;
+				magma_[i].islended = false;
+			}
+		}
+	}
+}
+
+void Pink::DrawMagma(const Camera& camera) {
+	const float kPi = 3.14f;
+
+	for (int i = 0;i < kMaxMagma;i++) {
+		if (!magma_[i].isActive) {
+			continue;
+		}
+
+		Vector2 screenPosition =
+			camera.WorldToScreen(
+				magma_[i].position
+			);
+
+		if (!magma_[i].islended) {
+			float t =
+				static_cast<float>(
+					magma_[i].flightTimer
+					) /
+				static_cast<float>(
+					magma_[i].flightTimer
+					);
+			if (t > 1.0f) {
+				t = 1.0f;
+			}
+
+			//放射物の高さ
+			float arcHeight =
+				std::sin(t * kPi) * 100.0f;
+
+			screenPosition.y -= arcHeight;
+
+			//飛んでいるマグマ
+			Novice::DrawEllipse(
+				static_cast<int>(screenPosition.x),
+				static_cast<int>(screenPosition.y),
+				static_cast<int>(magma_[i].radius),
+				static_cast<int>(magma_[i].radius),
+				0.0f,
+				0xFF4400FF,
+				kFillModeSolid
+			);
+
+			//中心部分
+			Novice::DrawEllipse(
+				static_cast<int>(screenPosition.x),
+				static_cast<int>(screenPosition.y),
+				static_cast<int>(
+					magma_[i].radius / 2.0f
+					),
+				static_cast<int>(
+					magma_[i].radius / 2.0f
+					),
+				0.0f,
+				0xFFFF00FF,
+				kFillModeSolid
+			);
+		} else {
+			//地面に残ったマグマ
+			int pulse =
+				magma_[i].remainTimer % 20;
+
+			int radius =
+				static_cast<int>(
+					magma_[i].radius
+					) + pulse / 4;
+			Novice::DrawEllipse(
+				static_cast<int>(screenPosition.x),
+				static_cast<int>(screenPosition.y),
+				radius,
+				radius / 2,
+				0.0f,
+				0xFF3300FF,
+				kFillModeSolid
+			);
+
+			Novice::DrawEllipse(
+				static_cast<int>(screenPosition.x),
+				static_cast<int>(screenPosition.y),
+				radius / 2,
+				radius / 4,
+				0.0f,
+				0xFFAA00FF,
+				kFillModeSolid
+			);
+		}
+	}
 }
