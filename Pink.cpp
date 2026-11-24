@@ -1,5 +1,6 @@
 #include "Pink.h"
 #include "Camera.h"
+#include "Boss.h"
 
 #include <Novice.h>
 #include <cstdlib>
@@ -19,19 +20,6 @@ Pink::Pink() {
 }
 
 void Pink::Update(Vector2 playerPosition) {
-
-	UpdateState(playerPosition);
-	UpdateMovement();
-
-	bool canUseCommonAttack =
-		state_.current == State::Hover;
-
-	Boss::Update(canUseCommonAttack);
-
-	if (barrier_.isActive) {
-		barrier_.animationTimer++;
-	}
-
 	//先に現在の特殊攻撃状態を更新
 	UpdateState(playerPosition);
 
