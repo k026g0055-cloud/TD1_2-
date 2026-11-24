@@ -23,6 +23,7 @@ public:
 protected:
 	void ClearBullets();
 	Vector2 GetPosition() const;
+	void SetPosition(Vector2 positoin);
 
 private:
 	void Warp();

@@ -12,9 +12,22 @@ Pink::Pink() {
 	barrier_.hp = 3;
 	barrier_.isActive = false;
 	barrier_.animationTimer = 0;
+
+	moveTarget_ = GetPosition();
+	moveSpeed_ = 2.0f;
+	moveTimer_ = 0;
 }
 
 void Pink::Update(Vector2 playerPosition) {
+
+	UpdateState(playerPosition);
+	UpdateMovement();
+
+	bool canUseCommonAttack =
+		state_.current == State::Hover;
+
+	Boss::Update(canUseCommonAttack);
+
 	if (barrier_.isActive) {
 		barrier_.animationTimer++;
 	}
@@ -97,7 +110,7 @@ void Pink::UpdateState(Vector2 playerPosition) {
 	state_.timer++;
 	switch (state_.current) {
 	case State::Hover:
-		if (state_.timer >= 120) {
+		if (state_.timer >= 90) {
 			const int attackCount = barrier_.isActive ? 4 : 5;
 			int attackNumber = rand() % attackCount;
 			switch (attackNumber)
@@ -376,3 +389,24 @@ bool Pink::IsBeamHit(
 		<= hitRadius * hitRadius;
 }
 
+void Pink::SelectMoveTarget() {
+	const int left =
+		4 * kTileSize;
+
+	const int rigth =
+		(kBossMapWidth - 4) * kTileSize;
+
+	const int top =
+		3 * kTileSize;
+
+	//ボスはマップ上半分を移動	
+	const int bottom =
+		(kBossMapHeight / 2) * kTileSize;
+
+	moveTarget_.x = static_cast<float>(left + rand() % (rigth - left + 1));
+	moveTarget_.y = static_cast<float>(top + rand() % (bottom - top + 1));
+
+	//次の目的地を選びなおすまで2~4秒
+	moveTimer_ =
+		120 + rand() % 121;
+}

@@ -54,6 +54,12 @@ private:
 	void DrawBarrier(const Camera& camera);
 	void PrepareBeam(Vector2 playerPosition);
 	void UpdateState(Vector2 playerPosition);
+	void UpdateMovement();
+	void SelectMoveTarget();
+
+	Vector2 moveTarget_ = {};
+	float moveSpeed_ = 2.0f;
+	int moveTimer_ = 0;
 
 	BeamDate beam_;
 	StateData state_;
