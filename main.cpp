@@ -186,17 +186,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			}
 			bool qteStarted = false;
 
-			// QTE開始処理
+			// QTE開始
 			if (!qte.IsPlaying())
 			{
-				// 初心者QTE
 				if (input.IsKeyTrigger(DIK_1) ||
 					input.IsButtonTrigger(XINPUT_GAMEPAD_DPAD_LEFT))
 				{
 					qte.Start(QTE_BEGINNER);
 					qteStarted = true;
 				}
-				// 上級者QTE
 				else if (input.IsKeyTrigger(DIK_2) ||
 					input.IsButtonTrigger(XINPUT_GAMEPAD_DPAD_RIGHT))
 				{
@@ -206,22 +204,23 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			}
 
 			// QTE更新
-			if (qte.IsPlaying())
+			if (qte.IsPlaying() && !qteStarted)
 			{
-				if (!qteStarted)
-				{
-					qte.Update(input);
-				}
+				qte.Update(input);
 			}
-			
-			map.DebugBoss(camera);
 
-			// 移動処理
+			// プレイヤー更新
 			if (!qte.IsPlaying() ||
 				qte.GetMode() == QTE_BEGINNER)
 			{
 				player.Update(input, map);
 			}
+
+			// ボス専用フィールドから出ないようにする
+			player.ClampToArea(
+				static_cast<float>(kBossMapWidth * kTileSize),
+				static_cast<float>(kBossMapHeight * kTileSize)
+			);
 
 			// カメラ更新
 			camera.Update(player.GetPosition());
@@ -229,12 +228,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			// ボス更新
 			boss.Update();
 
-			// 描画処理
-			map.Debug(camera);
+			// 描画
+			map.DebugBoss(camera);
 			boss.Draw(camera);
 			player.Draw(camera);
 
-			// QTE操作説明
+			// 操作説明
 			Novice::ScreenPrintf(
 				10, 200,
 				"DPAD LEFT : BEGINNER"
@@ -245,7 +244,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 				"DPAD RIGHT : ADVANCED"
 			);
 
-			// QTEは最後に描画
+			// QTEは一番手前に描画
 			qte.Draw();
 
 			break;

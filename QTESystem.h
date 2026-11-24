@@ -112,6 +112,14 @@ private:
     // 次のセットへ
     void NextSet();
 
+    // 矢印を描画
+    void DrawCommandArrow(
+        QTECommand command,
+        int centerX,
+        int centerY,
+        unsigned int color
+    ) const;
+
     // ボタン入力取得
     QTECommand GetButtonInput(
         const InputManager& input) const;
