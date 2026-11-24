@@ -21,9 +21,9 @@ namespace {
 }
 
 Boss::Boss() {
-	position_ = { 
-		25.0f* kTileSize ,
-		5.0f* kTileSize
+	position_ = {
+		kBossMapWidth * kTileSize / 2.0f ,
+		kBossMapHeight * kTileSize / 2.0f
 	};
 	radius_ = 30.0f;
 
@@ -50,7 +50,7 @@ void Boss::Update(bool canUseCommonAttack) {
 		attackTimer_--;
 		if (attackTimer_ <= 0) {
 			FireRadialBullets();
-			attackTimer_ = randomFrame(4,7);
+			attackTimer_ = randomFrame(4, 7);
 		}
 	}
 
@@ -144,7 +144,7 @@ void Boss::Draw(const Camera& camera)
 		kFillModeSolid
 	);
 
-	
+
 	for (int i = 0; i < kMaxBullets; i++)
 	{
 		if (!bullets_[i].isActive)
