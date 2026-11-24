@@ -51,18 +51,18 @@ private:
 	};
 
 	struct MagmaData {
-		Vector2 startPosition = {};
-		Vector2 targetPosition = {};
 		Vector2 position = {};
+		Vector2 velocity = {};
 
+		float landingY = 0.0f;
 		float radius = 24.0f;
+		float gravity = 0.35f;
 
-		int flightTimer = 0;
-		int flightTime = 60;
 		int remainTimer = 0;
 
 		bool isActive = false;
-		bool islended = false;
+		bool isLanded = false;
+
 	};
 
 	void ChangeState(State nextState);
