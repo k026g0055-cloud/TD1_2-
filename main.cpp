@@ -21,6 +21,7 @@ enum Sceen
 	PLAY,
 	BOSS,
 	PINK,
+	BLUE_BOSS,
 	MENU
 };
 
@@ -46,6 +47,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// ボス
 	Boss boss;
 	Pink pink;
+	Blue_Boss blue_boss;
 
 	// マップ
 	static Map map;
@@ -164,6 +166,24 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		{
 			Novice::ScreenPrintf(10, 10, "boss");
 
+			player.Update(input,map);
+			player.ClampToArea(
+				static_cast<float>(kBossMapWidth * kTileSize),
+				static_cast<float>(kBossMapHeight * kTileSize)
+			);
+			camera.Update(player.GetPosition());
+			boss.Update();
+
+			Vector2 PlayerPosition = player.GetPosition();
+			int playerTileX = static_cast<int>(PlayerPosition.x) / kTileSize;
+			int playerTileY = static_cast<int>(PlayerPosition.y) / kTileSize;
+
+			if (playerTileX >= kMapWidth - 4 &&
+				playerTileY <= 3) {
+				player.SetPosition({ 640.0f,620.0f });
+				currentSceen = BOSS;
+				break;
+			}
 			bool qteStarted = false;
 
 			// QTE開始
@@ -230,7 +250,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			break;
 		}
 
-		/*case BLUE_BOSS:
+		case BLUE_BOSS:
 		{
 			Novice::ScreenPrintf(10, 10, "blue boss");
 
@@ -251,7 +271,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 				player.SetPosition({ 640.0f,620.0f });
 				currentSceen = BLUE_BOSS;
 				break;
-
+			}
 
 			map.Debug(camera);
 			boss.Draw(camera);
@@ -271,18 +291,27 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			);
 
 			break;
-		}*/
+		}
 		case PINK:
 		{
 			Novice::ScreenPrintf(10, 10, "PINK");
 
 			player.Update(input, map);
 			player.ClampToArea(
+		
 				static_cast<float>(kBossMapWidth * kTileSize),
 				static_cast<float>(kBossMapHeight * kTileSize)
 			);
 			camera.Update(player.GetPosition());
 			pink.Update(player.GetPosition());
+
+			if (pink.IsBeamHit(
+				player.GetPosition(),
+				24.0f)) {
+				Novice::ScreenPrintf(
+					500, 100, "Beam HIT"
+				);
+			}
 
 			Vector2 PlayerPosition = player.GetPosition();
 			int playerTileX = static_cast<int>(PlayerPosition.x) / kTileSize;

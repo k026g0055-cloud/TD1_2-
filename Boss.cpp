@@ -125,6 +125,10 @@ Vector2 Boss::GetPosition() const {
 	return position_;
 }
 
+void Boss::SetPosition(Vector2 position) {
+	position_ = position;
+}
+
 void Boss::Draw(const Camera& camera)
 {
 	Vector2 bossScreenPosition =
