@@ -166,6 +166,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		{
 			Novice::ScreenPrintf(10, 10, "boss");
 
+			qte.Debug();
+
 			player.Update(input,map);
 			player.ClampToArea(
 				static_cast<float>(kBossMapWidth * kTileSize),
