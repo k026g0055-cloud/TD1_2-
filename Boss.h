@@ -1,6 +1,7 @@
 #pragma once
 #include "Vector2.h"
 #include "GameConfig.h"
+#include "GameTimer.h"
 
 class Camera;
 
@@ -35,8 +36,8 @@ private:
 	};
 	float radius_;
 
-	int warpTimer_;
-	int attackTimer_;
+	GameTimer warpTimer_;
+	GameTimer attackTimer_;
 
 	Bullet bullets_[kMaxBullets];
 };

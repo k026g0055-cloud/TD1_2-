@@ -1,5 +1,6 @@
 #pragma once
 #include "Boss.h"
+#include "GameTimer.h"
 
 class Camera;
 
@@ -58,7 +59,7 @@ private:
 		float radius = 24.0f;
 		float gravity = 0.35f;
 
-		int remainTimer = 0;
+		GameTimer remainTimer;
 
 		bool isActive = false;
 		bool isLanded = false;
