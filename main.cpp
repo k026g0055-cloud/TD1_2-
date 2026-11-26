@@ -322,6 +322,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 				);
 			}
 
+			if (pink.IsBarrierHit(player.GetPosition(), { 24.0f,24.0f })) {
+				Novice::ScreenPrintf(
+					500, 100, "Barrier Hit"
+				);
+			}
+
 			Vector2 PlayerPosition = player.GetPosition();
 			int playerTileX = static_cast<int>(PlayerPosition.x) / kTileSize;
 			int playerTileY = static_cast<int>(PlayerPosition.y) / kTileSize;

@@ -13,6 +13,7 @@ public:
 	void Draw(const Camera& camera);
 	void DamageBarrier(int damage);
 	bool IsBarrierActive() const;
+	bool IsBarrierHit(Vector2 attackCenter, Vector2 attackHalfSize) const;
 	bool IsBeamHit(
 		Vector2 playerPosition,
 		float playerRadius
@@ -100,6 +101,7 @@ private:
 	float moveSpeed_ = 2.0f;
 	float flameAngle_ = 0.0f;
 	int moveTimer_ = 0;
+	int GetBarrierBaseRadius() const;
 
 	FlameCircle GetFlameCircle(int row, int Iane) const;
 	BeamData beam_;
