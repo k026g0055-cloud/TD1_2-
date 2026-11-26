@@ -1,6 +1,7 @@
 #include "Pink.h"
 #include "Camera.h"
 #include "Boss.h"
+#include "GameTimer.h"
 
 #include <Novice.h>
 #include <algorithm>
@@ -115,7 +116,7 @@ void Pink::SpawnMagma(Vector2 playerPosition) {
 
 			magma_[i].radius = 24.0f;
 			magma_[i].gravity = 0.35f;
-			magma_[i].remainTimer = 360;
+			magma_[i].remainTimer.Start(360);
 			magma_[i].isActive = true;
 			magma_[i].isLanded = false;
 
@@ -575,8 +576,8 @@ void Pink::UpdateMagma() {
 				magma_[i].isLanded = true;
 			}
 		} else {
-			magma_[i].remainTimer--;
-			if (magma_[i].remainTimer <= 0) {
+			magma_[i].remainTimer.Update();
+			if (magma_[i].remainTimer.IsFinishes() <= 0) {
 				magma_[i].isActive = false;
 				magma_[i].isLanded = false;
 			}
@@ -624,7 +625,7 @@ void Pink::DrawMagma(const Camera& camera) {
 		} else {
 			// 着弾後のマグマ
 			int pulse =
-				magma_[i].remainTimer % 20;
+				magma_[i].remainTimer.GetRemaining() % 20;
 
 			int radius =
 				static_cast<int>(

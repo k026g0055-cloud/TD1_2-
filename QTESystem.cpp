@@ -13,8 +13,8 @@ void QTESystem::Initialize()
     currentSet_ = 0;
     currentCommand_ = 0;
 
-    timer_ = 0;
-    timeLimit_ = 180;
+    timer_.Reset();
+    timeLimit_=180;
 
     damage_ = 0;
 
@@ -92,7 +92,7 @@ void QTESystem::SetupCommands()
     }
 
     timeLimit_ = 180;
-    timer_ = timeLimit_;
+    timer_.Start(timeLimit_);
 }
 
 // ボタン入力
@@ -224,10 +224,10 @@ void QTESystem::Update(const InputManager& input)
         return;
     }
 
-    timer_--;
+    timer_.Update();
 
     // 時間切れ
-    if (timer_ <= 0)
+    if (timer_.IsFinishes())
     {
         state_ = QTE_FAILED;
         return;
@@ -283,7 +283,7 @@ void QTESystem::NextSet()
         return;
     }
 
-    timer_ = timeLimit_;
+    timer_.Start(timeLimit_);
 
     stickHoldTimer_ = 0;
     holdingDirection_ = CMD_NONE;
@@ -516,7 +516,7 @@ void QTESystem::Draw() const
 
     // 制限時間ゲージ
     float rate =
-        static_cast<float>(timer_) /
+        static_cast<float>(timer_.GetRemaining()) /
         static_cast<float>(timeLimit_);
 
     Novice::DrawBox(
