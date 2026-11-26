@@ -13,6 +13,7 @@ void QTESystem::Initialize()
 
 	currentSet_ = 0;
 	currentCommand_ = 0;
+
 	timer_.Reset();
 	timeLimit_ = 180;
 
@@ -165,68 +166,23 @@ void QTESystem::SetupCommands()
 		{
 			commands_[2][i] = advancedSet3[pattern][i];
 		}
-		//３　セット目終了
+		//３セット目終了
 	}
-
-
-
 
 	timeLimit_ = 600;
-	timer_.Start(timeLimit_);
-	if (mode_ == QTE_BEGINNER)
-	{
-		// 1セット目
-		commands_[0][0] = CMD_A;
-		commands_[0][1] = CMD_B;
-		commandCounts_[0] = 2;
+	timer_.Start(600);
 
-		// 2セット目
-		commands_[1][0] = CMD_X;
-		commands_[1][1] = CMD_A;
-		commands_[1][2] = CMD_Y;
-		commandCounts_[1] = 3;
-
-		// 3セット目
-		commands_[2][0] = CMD_B;
-		commands_[2][1] = CMD_X;
-		commands_[2][2] = CMD_Y;
-		commands_[2][3] = CMD_A;
-		commandCounts_[2] = 4;
-	} else
-	{
-		// 1セット目：→ ↓ ↘
-		commands_[0][0] = CMD_RIGHT;
-		commands_[0][1] = CMD_DOWN;
-		commands_[0][2] = CMD_DOWN_RIGHT;
-		commandCounts_[0] = 3;
-
-		// 2セット目：↓ ↘ →
-		commands_[1][0] = CMD_DOWN;
-		commands_[1][1] = CMD_DOWN_RIGHT;
-		commands_[1][2] = CMD_RIGHT;
-		commandCounts_[1] = 3;
-
-		// 3セット目：→ ↓ ↘ →
-		commands_[2][0] = CMD_RIGHT;
-		commands_[2][1] = CMD_DOWN;
-		commands_[2][2] = CMD_DOWN_RIGHT;
-		commands_[2][3] = CMD_RIGHT;
-		commandCounts_[2] = 4;
-	}
-
-	timeLimit_ = 180;
-	timer_.Start(timeLimit_);
 }
 
-	// ボタン入力
-	QTECommand QTESystem::GetButtonInput(
-		const InputManager& input) const
+// ボタン入力
+QTECommand QTESystem::GetButtonInput(
+	const InputManager& input) const
+{
+	if (input.IsButtonTrigger(XINPUT_GAMEPAD_A) ||
+		input.IsKeyTrigger(DIK_J))
 	{
-		if (input.IsButtonTrigger(XINPUT_GAMEPAD_A) ||
-			input.IsKeyTrigger(DIK_J))
-		{
-			return CMD_A;
-		}
+		return CMD_A;
+	}
 
 	if (input.IsButtonTrigger(XINPUT_GAMEPAD_B) ||
 		input.IsKeyTrigger(DIK_K))
@@ -402,50 +358,7 @@ void QTESystem::Update(const InputManager& input)
 		currentCommand_ = 0;
 		commandTimer_ = 0;
 	}
-	if (state_ != QTE_PLAYING)
-	{
-		return;
-	}
 
-	timer_.Update();
-
-	// 時間切れ
-	if (timer_.IsFinishes())
-	{
-		state_ = QTE_FAILED;
-		return;
-	}
-
-	QTECommand command = CMD_NONE;
-
-	if (mode_ == QTE_BEGINNER)
-	{
-		command = GetButtonInput(input);
-	} else
-	{
-		command = GetStickInput(input);
-	}
-
-	if (command == CMD_NONE)
-	{
-		return;
-	}
-
-	QTECommand correct =
-		commands_[currentSet_][currentCommand_];
-
-	if (command == correct)
-	{
-		currentCommand_++;
-
-		if (currentCommand_ >= commandCounts_[currentSet_])
-		{
-			NextSet();
-		}
-	} else
-	{
-		state_ = QTE_FAILED;
-	}
 }
 
 // 次のセット
@@ -465,7 +378,6 @@ void QTESystem::NextSet()
 		return;
 	}
 
-	timer_ = timeLimit_;
 	timer_.Start(timeLimit_);
 
 	stickHoldTimer_ = 0;
@@ -784,130 +696,7 @@ void QTESystem::Draw() const
 	{
 		DrawXboxButtons();
 	}
-	if (state_ == QTE_IDLE)
-	{
-		return;
-	}
 
-	// QTE背景
-	Novice::DrawBox(
-		290, 150, 700, 350,
-		0.0f, 0x202030FF,
-		kFillModeSolid
-	);
-
-	if (state_ == QTE_SUCCESS)
-	{
-		Novice::ScreenPrintf(
-			530, 280,
-			"QTE SUCCESS!"
-		);
-
-		Novice::ScreenPrintf(
-			530, 310,
-			"DAMAGE : %d", damage_
-		);
-
-		return;
-	}
-
-	if (state_ == QTE_FAILED)
-	{
-		Novice::ScreenPrintf(
-			530, 280,
-			"QTE FAILED"
-		);
-
-		Novice::ScreenPrintf(
-			530, 310,
-			"DAMAGE : %d", damage_
-		);
-
-		return;
-	}
-
-	Novice::ScreenPrintf(
-		520, 180,
-		"BREAK COMBO"
-	);
-
-	Novice::ScreenPrintf(
-		500, 220,
-		"SET : %d / 3",
-		currentSet_ + 1
-	);
-
-	// コマンド表示
-	for (int i = 0;
-		i < commandCounts_[currentSet_];
-		i++)
-	{
-		int x = 390 + i * 130;
-		int y = 280;
-
-		unsigned int color = 0x555555FF;
-
-		if (i < currentCommand_)
-		{
-			color = 0x33AA66FF;
-		} else if (i == currentCommand_)
-		{
-			color = 0x4488FFFF;
-		}
-
-		Novice::DrawBox(
-			x, y, 110, 60,
-			0.0f, color,
-			kFillModeSolid
-		);
-
-		QTECommand command = commands_[currentSet_][i];
-
-		if (mode_ == QTE_ADVANCED)
-		{
-			// 上級者は矢印で表示
-			DrawCommandArrow(
-				command,
-				x + 55,
-				y + 30,
-				WHITE
-			);
-		} else
-		{
-			// 初心者はXYABを表示
-			Novice::ScreenPrintf(
-				x + 50,
-				y + 20,
-				"%s",
-				GetCommandText(command)
-			);
-		}
-	}
-
-	// 制限時間ゲージ
-	float rate =
-		static_cast<float>(timer_.GetRemaining()) /
-		static_cast<float>(timeLimit_);
-
-	Novice::DrawBox(
-		390, 400, 500, 20,
-		0.0f, 0x444444FF,
-		kFillModeSolid
-	);
-
-	Novice::DrawBox(
-		390, 400,
-		static_cast<int>(500 * rate),
-		20,
-		0.0f, 0xFFCC44FF,
-		kFillModeSolid
-	);
-
-	Novice::ScreenPrintf(
-		500, 440,
-		"DAMAGE : %d",
-		damage_
-	);
 }
 
 

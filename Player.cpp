@@ -183,7 +183,7 @@ void Player::UpdateAttackA()
 {
     attackTimer_.Update();
 
-    if (attackTimer_.IsFinishes())
+    if (attackTimer_.IsFinished())
     {
         state_ = NORMAL;
     }
@@ -193,7 +193,7 @@ void Player::UpdateAttackB()
 {
     attackTimer_.Update();
 
-    if (attackTimer_.IsFinishes())
+    if (attackTimer_.IsFinished())
     {
         state_ = NORMAL;
     }

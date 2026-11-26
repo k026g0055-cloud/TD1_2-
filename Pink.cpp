@@ -669,7 +669,7 @@ void Pink::UpdateMagma() {
 			}
 		} else {
 			magma_[i].remainTimer.Update();
-			if (magma_[i].remainTimer.IsFinishes()) {
+			if (magma_[i].remainTimer.IsFinished()) {
 				magma_[i].isActive = false;
 				magma_[i].isLanded = false;
 			}
