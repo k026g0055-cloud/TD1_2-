@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "InputManager.h"
@@ -56,6 +55,9 @@ public:
     // QTE描画
     void Draw() const;
 
+    void Debug();
+    void DrawXboxButtons() const;
+
     // 初期状態に戻す
     void Reset();
 
@@ -102,6 +104,19 @@ private:
 
     // ダメージ
     int damage_;
+
+    //コマンド猶予フレーム//
+    int commandTimer_;
+    //初心者
+    const int kCommandBeginnerTimeLimit = 30;
+    //上級者
+    const int kCommandAdvancedTimeLimit = 12;
+
+    // Xboxボタンの表示設定
+    const float buttonCenterX_ = 1100.0f;
+    const float buttonCenterY_ = 570.0f;
+    const float buttonDistance_ = 60.0f;
+    const int buttonRadius_ = 25;
 
     // 前フレームの方向
     QTECommand previousDirection_;
