@@ -499,7 +499,7 @@ void Pink::DrawFlame(const Camera& camera, bool isWarning) const {
 		for (int lane = -2;lane <= 2;++lane) {
 			const float offset = halfWidth * static_cast<float>(lane) / 2.0f;
 			const float x = origin.x + forwardx * distance - forwardy * offset;
-			const float y = origin.y = forwardy * distance + forwardx * offset;
+			const float y = origin.y + forwardy * distance + forwardx * offset;
 
 			//円の大きさをずらして炎を揺らす
 			const int radius = 16 + row + (state_.timer + row * 3 + lane + 2) % 5;
