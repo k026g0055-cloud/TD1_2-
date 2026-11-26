@@ -43,16 +43,6 @@ private:
 	Vector2 attackSize = {};
 
 	int hp_ = 5;
-
-	GameTimer attackTimer_;
-	int attackDamage_ = 0;
-	bool isAttackActive = false;
-	bool hasAttackHit_ = false;
-
-	Vector2 attackPosition = {};
-	Vector2 attackSize = {};
-
-	int hp_ = 5;
 	float speed_ = 5.0f;
 
 };

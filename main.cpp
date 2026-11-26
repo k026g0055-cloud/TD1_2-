@@ -117,7 +117,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		case PLAY:
 		{
 			//デバック用
-			if (input.IsButtonTrigger(XINPUT_GAMEPAD_RIGHT_THUMB))
+			if (input.IsButtonTrigger(XINPUT_GAMEPAD_RIGHT_THUMB) ||
+				input.IsKeyTrigger(DIK_1))
 			{
 				currentSceen = BOSS;
 			}

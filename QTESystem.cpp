@@ -173,9 +173,6 @@ void QTESystem::SetupCommands()
 
 }
 
-	timeLimit_ = 180;
-	timer_.Start(timeLimit_);
-}
 
 	// ボタン入力
 	QTECommand QTESystem::GetButtonInput(
