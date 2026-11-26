@@ -43,6 +43,7 @@ private:
 	Vector2 attackSize = {};
 
 	int hp_ = 5;
+
 	float speed_ = 5.0f;
 
 };
