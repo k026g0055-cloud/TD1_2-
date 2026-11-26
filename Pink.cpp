@@ -1,5 +1,6 @@
 #include "Pink.h"
 #include "Camera.h"
+#include "Boss.h"
 
 #include <Novice.h>
 #include <algorithm>

@@ -4,10 +4,10 @@ const int kWindowWidth = 1280;
 const int kWindowHeight = 720;
 
 //マップのサイズ
-const int kTileSize = 32;
-const int kMapWidth = 80;
-const int kMapHeight = 45;
+const int kTileSize = 64;
+const int kMapWidth = 40;
+const int kMapHeight = 20;
 
 //ボスマップのサイズ
-const int kBossMapWidth = 50;
-const int kBossMapHeight = 30;
+const int kBossMapWidth = 25;
+const int kBossMapHeight = 15;
