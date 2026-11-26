@@ -123,7 +123,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			}
 
 			Novice::ScreenPrintf(10, 10, "play");
-			player.Update(input,map);
 			player.Update(input, map);
 			Vector2 PlayerPosition = player.GetPosition();
 
@@ -215,7 +214,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			if (!qte.IsPlaying() ||
 				qte.GetMode() == QTE_BEGINNER)
 			{
-				player.Update(input, map);
+				player.UpdateMove(input, map);
 			}
 
 			// ボス専用フィールドから出ないようにする
