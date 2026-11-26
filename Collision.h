@@ -7,6 +7,7 @@ class collision
 {
 public:
 	//軸に平行な四角と楕円が重なっているか調べる
+	//マグマの当たり判定
 	static bool IntersectsBoxEllipse(
 		Vector2 boxCenter, Vector2 boxHalfSize,
 		Vector2 ellipseCenter, Vector2 ellipseRadius) {
@@ -32,6 +33,8 @@ public:
 		const float dy = (closetY - ellipseCenter.y) / ellipseRadius.y;
 		return dx * dx + dy * dy <= 1.0f;
 	}
+
+	//火炎放射当たり判定
 	static bool IntersectsCircleCapsule(
 		Vector2 circleCenter, float circleRadius,
 		Vector2 segmentStart, Vector2 segmentEnd, float segmentRadius) {

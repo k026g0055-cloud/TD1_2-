@@ -117,7 +117,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		case PLAY:
 		{
 			//デバック用
-			if (input.IsButtonTrigger(XINPUT_GAMEPAD_RIGHT_THUMB))
+			if (input.IsButtonTrigger(XINPUT_GAMEPAD_RIGHT_THUMB) ||
+				input.IsKeyTrigger(DIK_1))
 			{
 				currentSceen = BOSS;
 			}
@@ -148,14 +149,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 					kBossMapWidth * kTileSize / 2.0f,
 					kBossMapHeight * kTileSize - 100.0f
 					});
+				pink = Pink{};
 				currentSceen = PINK;
 				break;
 
 			}
 
 			player.Debug();
-			map.Debug(camera);
 			camera.Update(player.GetPosition());
+			map.Debug(camera);
 			player.Draw(camera);
 
 			break;
@@ -317,6 +319,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			if (pink.IsFlameHit(player.GetPosition(), { 24.0f,24.0f })) {
 				Novice::ScreenPrintf(
 					500, 100, "Flame Hit"
+				);
+			}
+
+			if (pink.IsBarrierHit(player.GetPosition(), { 24.0f,24.0f })) {
+				Novice::ScreenPrintf(
+					500, 100, "Barrier Hit"
 				);
 			}
 

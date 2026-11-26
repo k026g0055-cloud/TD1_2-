@@ -441,12 +441,7 @@ void Pink::DrawBarrier(const Camera& camera) {
 	Vector2 bossScreenPosition =
 		camera.WorldToScreen(GetPosition());
 
-	int pulse = barrier_.animationTimer % 30;
-	if (pulse > 15) {
-		pulse = 30 - pulse;
-	}
-
-	const int baseRadius = 55 + pulse / 3;
+	const int baseRadius = GetBarrierBaseRadius();
 
 	for (int i = 0; i < barrier_.hp; i++) {
 		const int radius = baseRadius + i * 12;
@@ -531,6 +526,31 @@ Pink::FlameCircle Pink::GetFlameCircle(int row, int lane) const
 		},
 		16 + row + (state_.timer + row * 3 + lane + 2) % 5
 	};
+}
+
+int Pink::GetBarrierBaseRadius() const {
+	int pulse = barrier_.animationTimer % 30;
+	if (pulse > 15) {
+		pulse = 30 - pulse;
+	}
+
+	return 55 + pulse / 3;
+}
+
+bool Pink::IsBarrierHit(Vector2 attackCenter, Vector2 attackHalfSize) const {
+	if (!barrier_.isActive || barrier_.hp <= 0) {
+		return false;
+	}
+
+	//描画と同じ、一番外側の円の半径を使う
+	const float radius = static_cast<float>(
+		GetBarrierBaseRadius() + (barrier_.hp - 1) * 12
+		);
+
+	return collision::IntersectsBoxEllipse(
+		attackCenter, attackHalfSize,
+		GetPosition(), { radius,radius }
+	);
 }
 
 bool Pink::IsFlameHit(Vector2 playerPosition, Vector2 playerHalfSize) const
@@ -669,7 +689,7 @@ void Pink::UpdateMagma() {
 			}
 		} else {
 			magma_[i].remainTimer.Update();
-			if (magma_[i].remainTimer.IsFinishes()) {
+			if (magma_[i].remainTimer.IsFinished()) {
 				magma_[i].isActive = false;
 				magma_[i].isLanded = false;
 			}
