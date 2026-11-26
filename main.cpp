@@ -314,7 +314,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			}
 			if (pink.IsMagmaHit(player.GetPosition(), { 24.0f,24.0f })) {
 				Novice::ScreenPrintf(
-					500, 100, "MagmaHit"
+					500, 100, "Magma Hit"
+				);
+			}
+
+			if (pink.IsFlameHit(player.GetPosition(), { 24.0f,24.0f })) {
+				Novice::ScreenPrintf(
+					500, 100, "Flame Hit"
 				);
 			}
 

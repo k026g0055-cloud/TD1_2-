@@ -471,47 +471,93 @@ void Pink::DrawBarrier(const Camera& camera) {
 }
 
 void Pink::DrawFlame(const Camera& camera, bool isWarning) const {
-	const float kRange = 240.0f;
-	const float kHalfAngle = 0.4f;
-	Vector2 origin = camera.WorldToScreen(GetPosition());
+	if (isWarning)
+	{
+		const Vector2 origin = camera.WorldToScreen(GetPosition());
 
-	if (isWarning) {
-		for (int side = -1;side <= 1;side += 2) {
-			const float angle = flameAngle_ + kHalfAngle * static_cast<float>(side);
+		// 予告線を、炎の左右の端に沿って引く。
+		const float lineLength = kFlameRange / std::cos(kFlameHalfAngle);
+
+		for (int side = -1; side <= 1; side += 2)
+		{
+			const float angle =
+				flameAngle_ + kFlameHalfAngle * static_cast<float>(side);
 
 			Novice::DrawLine(
 				static_cast<int>(origin.x),
 				static_cast<int>(origin.y),
-				static_cast<int>(origin.x + std::cos(angle) * kRange),
-				static_cast<int>(origin.y + std::sin(angle) * kRange),
+				static_cast<int>(origin.x + std::cos(angle) * lineLength),
+				static_cast<int>(origin.y + std::sin(angle) * lineLength),
 				0xFFAA00FF
 			);
 		}
+
 		return;
 	}
-	const float forwardx = std::cos(flameAngle_);
-	const float forwardy = std::sin(flameAngle_);
-	const float spread = std::tan(kHalfAngle);
 
-	for (int row = 1;row <= 9;++row) {
-		const float distance = kRange * static_cast<float>(row) / 9.0f;
-		const float halfWidth = distance * spread;
-		for (int lane = -2;lane <= 2;++lane) {
-			const float offset = halfWidth * static_cast<float>(lane) / 2.0f;
-			const float x = origin.x + forwardx * distance - forwardy * offset;
-			const float y = origin.y + forwardy * distance + forwardx * offset;
-
-			//円の大きさをずらして炎を揺らす
-			const int radius = 16 + row + (state_.timer + row * 3 + lane + 2) % 5;
+	for (int row = 1; row <= 9; ++row)
+	{
+		for (int lane = -2; lane <= 2; ++lane)
+		{
+			const FlameCircle flame = GetFlameCircle(row, lane);
+			const Vector2 screen = camera.WorldToScreen(flame.position);
 
 			Novice::DrawEllipse(
-				static_cast<int>(x), static_cast<int>(y),
-				radius, radius,
-				0.0f, lane == 0 ? 0xFFCC33FF : 0xFF5511FF,
+				static_cast<int>(screen.x),
+				static_cast<int>(screen.y),
+				flame.radius,
+				flame.radius,
+				0.0f,
+				lane == 0 ? 0xFFCC33FF : 0xFF5511FF,
 				kFillModeSolid
 			);
 		}
 	}
+}
+
+Pink::FlameCircle Pink::GetFlameCircle(int row, int lane) const
+{
+	const Vector2 origin = GetPosition();
+	const float forwardX = std::cos(flameAngle_);
+	const float forwardY = std::sin(flameAngle_);
+	const float distance = kFlameRange * static_cast<float>(row) / 9.0f;
+	const float halfWidth = distance * std::tan(kFlameHalfAngle);
+	const float offset = halfWidth * static_cast<float>(lane) / 2.0f;
+
+	return {
+		{
+			origin.x + forwardX * distance - forwardY * offset,
+			origin.y + forwardY * distance + forwardX * offset
+		},
+		16 + row + (state_.timer + row * 3 + lane + 2) % 5
+	};
+}
+
+bool Pink::IsFlameHit(Vector2 playerPosition, Vector2 playerHalfSize) const
+{
+	// 実際に火を吹いている間だけ判定する。
+	if (state_.current != State::FlameThrower)
+	{
+		return false;
+	}
+
+	for (int row = 1; row <= 9; ++row)
+	{
+		for (int lane = -2; lane <= 2; ++lane)
+		{
+			const FlameCircle flame = GetFlameCircle(row, lane);
+			const float radius = static_cast<float>(flame.radius);
+
+			if (collision::IntersectsBoxEllipse(
+				playerPosition, playerHalfSize,
+				flame.position, { radius, radius }))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 bool Pink::IsBeamHit(
