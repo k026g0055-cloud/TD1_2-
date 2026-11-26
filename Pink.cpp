@@ -24,7 +24,6 @@ Pink::Pink() {
 
 void Pink::Update(Vector2 playerPosition) {
 
-	UpdateState(playerPosition);
 	UpdateMovement();
 	UpdateMagma();
 
@@ -109,8 +108,8 @@ void Pink::SpawnMagma(Vector2 playerPosition) {
 			magma_[i].position = bossPosition;
 
 			magma_[i].velocity = {
-				velocityX[shot]+randomVelocityX,
-				velocityY[shot]+randomVelocityY
+				velocityX[shot] + randomVelocityX,
+				velocityY[shot] + randomVelocityY
 			};
 
 			magma_[i].landingY = landingY;
@@ -132,6 +131,8 @@ void Pink::UpdateMovement()
 	if (state_.current == State::BeamWarning ||
 		state_.current == State::Beam ||
 		state_.current == State::Strike ||
+		state_.current == State::FlameWarning ||
+		state_.current == State::FlameThrower ||
 		state_.current == State::Stunned)
 	{
 		return;
@@ -245,8 +246,16 @@ void Pink::UpdateState(Vector2 playerPosition) {
 				ChangeState(State::BeamWarning);
 				break;
 			case 2:
-				ChangeState(State::FlameThrower);
+			{
+				const Vector2 bossPosition = GetPosition();
+				flameAngle_ = std::atan2(
+					playerPosition.y - bossPosition.y,
+					playerPosition.x - bossPosition.x
+				);
+
+				ChangeState(State::FlameWarning);
 				break;
+			}
 			case 3:
 				ChangeState(State::Strike);
 				break;
@@ -280,6 +289,11 @@ void Pink::UpdateState(Vector2 playerPosition) {
 		//1.5秒間ビーム発射
 		if (state_.timer >= 90) {
 			ChangeState(State::Hover);
+		}
+		break;
+	case State::FlameWarning:
+		if (state_.timer >= 30) {
+			ChangeState(State::FlameThrower);
 		}
 		break;
 	case State::FlameThrower:
@@ -402,8 +416,13 @@ void Pink::DrawAttack(const Camera& camera) {
 
 		break;
 	}
+	case State::FlameWarning:
+		Novice::ScreenPrintf(10, 80, "Boss State : FlameWarning");
+		DrawFlame(camera, true);
+		break;
 	case State::FlameThrower:
-		Novice::ScreenPrintf(10, 80, "Boss State : Flame Thrower");
+		Novice::ScreenPrintf(10, 80, "Boss State : FlameThrower");
+		DrawFlame(camera, false);
 		break;
 	case State::Strike:
 		Novice::ScreenPrintf(10, 80, "Boss State : Strike");
@@ -449,6 +468,50 @@ void Pink::DrawBarrier(const Camera& camera) {
 		"Barrier HP : %d",
 		barrier_.hp
 	);
+}
+
+void Pink::DrawFlame(const Camera& camera, bool isWarning) const {
+	const float kRange = 240.0f;
+	const float kHalfAngle = 0.4f;
+	Vector2 origin = camera.WorldToScreen(GetPosition());
+
+	if (isWarning) {
+		for (int side = -1;side <= 1;side += 2) {
+			const float angle = flameAngle_ + kHalfAngle * static_cast<float>(side);
+
+			Novice::DrawLine(
+				static_cast<int>(origin.x),
+				static_cast<int>(origin.y),
+				static_cast<int>(origin.x + std::cos(angle) * kRange),
+				static_cast<int>(origin.y + std::sin(angle) * kRange),
+				0xFFAA00FF
+			);
+		}
+		return;
+	}
+	const float forwardx = std::cos(flameAngle_);
+	const float forwardy = std::sin(flameAngle_);
+	const float spread = std::tan(kHalfAngle);
+
+	for (int row = 1;row <= 9;++row) {
+		const float distance = kRange * static_cast<float>(row) / 9.0f;
+		const float halfWidth = distance * spread;
+		for (int lane = -2;lane <= 2;++lane) {
+			const float offset = halfWidth * static_cast<float>(lane) / 2.0f;
+			const float x = origin.x + forwardx * distance - forwardy * offset;
+			const float y = origin.y + forwardy * distance + forwardx * offset;
+
+			//円の大きさをずらして炎を揺らす
+			const int radius = 16 + row + (state_.timer + row * 3 + lane + 2) % 5;
+
+			Novice::DrawEllipse(
+				static_cast<int>(x), static_cast<int>(y),
+				radius, radius,
+				0.0f, lane == 0 ? 0xFFCC33FF : 0xFF5511FF,
+				kFillModeSolid
+			);
+		}
+	}
 }
 
 bool Pink::IsBeamHit(
@@ -526,7 +589,7 @@ void Pink::UpdateMagma() {
 			continue;
 		}
 		if (!magma_[i].isLanded) {
-			magma_[i].position.x += 
+			magma_[i].position.x +=
 				magma_[i].velocity.x;
 			magma_[i].position.y +=
 				magma_[i].velocity.y;
