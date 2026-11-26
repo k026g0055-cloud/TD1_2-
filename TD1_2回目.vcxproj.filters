@@ -172,5 +172,8 @@
     <ClInclude Include="GameTimer.h">
       <Filter>ヘッダーファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Collision.h">
+      <Filter>ヘッダーファイル</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
