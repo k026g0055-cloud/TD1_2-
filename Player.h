@@ -33,6 +33,15 @@ private:
 	Vector2 position_ = {};
 	Vector2 size_ = { 48.0f, 48.0f };
 	Vector2 direction_ = { 0.0f, 1.0f };
+
+	GameTimer attackTimer_;
+	int attackDamage_ = 0;
+	bool isAttackActive = false;
+	bool hasAttackHit_ = false;
+
+	Vector2 attackPosition = {};
+	Vector2 attackSize = {};
+
 	int hp_ = 5;
 
 	GameTimer attackTimer_;
