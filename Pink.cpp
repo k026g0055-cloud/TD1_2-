@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "Boss.h"
 #include "GameTimer.h"
+#include "Collision.h"
 
 #include <Novice.h>
 #include <algorithm>
@@ -458,61 +459,43 @@ bool Pink::IsBeamHit(
 	if (state_.current != State::Beam) {
 		return false;
 	}
-
-	Vector2 beamStart = GetPosition();
-
-	Vector2 beamEnd = {
+	const Vector2 beamStart = GetPosition();
+	const Vector2 beamEnd = {
 		beamStart.x + beam_.direction.x * beam_.length,
 		beamStart.y + beam_.direction.y * beam_.length
 	};
+	return collision::IntersectsCircleCapsule(
+		playerPosition,
+		playerRadius,
+		beamStart,
+		beamEnd,
+		static_cast<float>(beam_.halfWidth)
+	);
+}
 
-	Vector2 beamVector = {
-		beamEnd.x - beamStart.x,
-		beamEnd.y - beamStart.y
-	};
+bool Pink::IsMagmaHit(
+	Vector2 playerPosition,
+	Vector2 playerHalfSize
+) const {
+	for (const auto& magma : magma_) {
+		if (!magma.isActive || !magma.isLanded) {
+			continue;
+		}
 
-	Vector2 playerVector = {
-		playerPosition.x - beamStart.x,
-		playerPosition.y - beamStart.y
-	};
+		//描画と同じ楕円の半径を使う
+		const int pulse = magma.remainTimer.GetRemaining() % 20;
+		const int radius = static_cast<int>(magma.radius) + pulse / 4;
+		const Vector2 ellipseRadius = {
+			static_cast<float>(radius),
+			static_cast<float>(radius / 2)
+		};
 
-	float beamLengthSquared =
-		beamVector.x * beamVector.x +
-		beamVector.y * beamVector.y;
-
-	if (beamLengthSquared <= 0.001f) {
-		return false;
+		if (collision::IntersectsBoxEllipse(
+			playerPosition, playerHalfSize, magma.position, ellipseRadius)) {
+			return true;
+		}
 	}
-
-	float t =
-		(playerVector.x * beamVector.x +
-			playerVector.y * beamVector.y) /
-		beamLengthSquared;
-
-	if (t < 0.0f) {
-		t = 0.0f;
-	} else if (t > 1.0f) {
-		t = 1.0f;
-	}
-
-	Vector2 nearestPosition = {
-		beamStart.x + beamVector.x * t,
-		beamStart.y + beamVector.y * t
-	};
-
-	float distanceX =
-		playerPosition.x - nearestPosition.x;
-
-	float distanceY =
-		playerPosition.y - nearestPosition.y;
-
-	float hitRadius =
-		static_cast<float>(beam_.halfWidth) +
-		playerRadius;
-
-	return distanceX * distanceX +
-		distanceY * distanceY
-		<= hitRadius * hitRadius;
+	return false;
 }
 
 void Pink::SelectMoveTarget() {

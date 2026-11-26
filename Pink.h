@@ -17,6 +17,10 @@ public:
 		Vector2 playerPosition,
 		float playerRadius
 	) const;
+	bool IsMagmaHit(
+		Vector2 playerPosition,
+		Vector2 playerHalfSize
+	) const;
 
 private:
 	enum class State
