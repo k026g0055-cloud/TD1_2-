@@ -314,6 +314,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 					500, 100, "Beam HIT"
 				);
 			}
+			if (pink.IsMagmaHit(player.GetPosition(), { 24.0f,24.0f })) {
+				Novice::ScreenPrintf(
+					500, 100, "MagmaHit"
+				);
+			}
 
 			Vector2 PlayerPosition = player.GetPosition();
 			int playerTileX = static_cast<int>(PlayerPosition.x) / kTileSize;

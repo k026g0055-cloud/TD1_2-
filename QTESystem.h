@@ -1,6 +1,7 @@
 #pragma once
 
 #include "InputManager.h"
+#include "GameTimer.h"
 
 // QTEの操作方式
 enum QTEMode
@@ -99,7 +100,7 @@ private:
     int currentCommand_;
 
     // 制限時間
-    int timer_;
+    GameTimer timer_;
     int timeLimit_;
 
     // ダメージ

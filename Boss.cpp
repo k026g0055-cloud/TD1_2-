@@ -21,14 +21,14 @@ namespace {
 }
 
 Boss::Boss() {
-	position_ = { 
-		25.0f* kTileSize ,
-		5.0f* kTileSize
+	position_ = {
+		kBossMapWidth * kTileSize / 2.0f ,
+		kBossMapHeight * kTileSize / 2.0f
 	};
 	radius_ = 30.0f;
 
-	warpTimer_ = randomFrame(5, 9);
-	attackTimer_ = randomFrame(4, 7);
+	warpTimer_.Start(randomFrame(5, 9));
+	attackTimer_.Start(randomFrame(4, 7));
 
 	for (int i = 0;i < kMaxBullets;i++) {
 		bullets_[i].position = {};
@@ -41,24 +41,24 @@ void Boss::Update(bool canUseCommonAttack) {
 
 	//Hover中だけワープと全方位弾を更新
 	if (canUseCommonAttack) {
-		warpTimer_--;
-		if (warpTimer_ < -0) {
+		warpTimer_.Update();
+		if (warpTimer_ .IsFinishes()) {
 			Warp();
-			warpTimer_ = randomFrame(5, 9);
+			warpTimer_.Start(randomFrame(5, 9));
 		}
 
-		attackTimer_--;
-		if (attackTimer_ <= 0) {
+		attackTimer_.Update();
+		if (attackTimer_.IsFinishes()) {
 			FireRadialBullets();
-			attackTimer_ = randomFrame(4,7);
+			attackTimer_.Start(randomFrame(4, 7));
 		}
 	}
 
 	//全方位弾発射の時間を減らす
-	attackTimer_--;
-	if (attackTimer_ <= 0) {
+	attackTimer_.Update();
+	if (attackTimer_.IsFinishes()) {
 		FireRadialBullets();
-		attackTimer_ = 120;
+		attackTimer_.Start(120);
 	}
 
 	//発射済みの弾は、特殊攻撃中でも移動させる
@@ -144,7 +144,7 @@ void Boss::Draw(const Camera& camera)
 		kFillModeSolid
 	);
 
-	
+
 	for (int i = 0; i < kMaxBullets; i++)
 	{
 		if (!bullets_[i].isActive)
