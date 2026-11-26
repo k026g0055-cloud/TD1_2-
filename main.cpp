@@ -167,14 +167,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 			qte.Debug();
 
-			player.Update(input,map);
-			player.ClampToArea(
-				static_cast<float>(kBossMapWidth * kTileSize),
-				static_cast<float>(kBossMapHeight * kTileSize)
-			);
-			camera.Update(player.GetPosition());
-			boss.Update();
-
 			Vector2 PlayerPosition = player.GetPosition();
 			int playerTileX = static_cast<int>(PlayerPosition.x) / kTileSize;
 			int playerTileY = static_cast<int>(PlayerPosition.y) / kTileSize;
@@ -211,8 +203,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			}
 
 			// プレイヤー更新
-			if (!qte.IsPlaying() ||
-				qte.GetMode() == QTE_BEGINNER)
+			if (!qte.IsPlaying())
+			{
+				player.Update(input, map);
+			}
+			else if (qte.GetMode() == QTE_BEGINNER)
 			{
 				player.UpdateMove(input, map);
 			}
