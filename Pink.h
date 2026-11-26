@@ -21,6 +21,10 @@ public:
 		Vector2 playerPosition,
 		Vector2 playerHalfSize
 	) const;
+	bool IsFlameHit(
+		Vector2 playerPosition,
+		Vector2 playerHalfSize
+	) const;
 
 private:
 	enum class State
@@ -35,8 +39,6 @@ private:
 		Stunned
 	};
 
-	static const int kMaxMagma = 30;
-	float flameAngle_ = 0.0f;
 
 	//状態を管理する構造体
 	struct StateData {
@@ -72,6 +74,11 @@ private:
 
 	};
 
+	struct FlameCircle {
+		Vector2 position;
+		int radius;
+	};
+
 	void ChangeState(State nextState);
 	void ActivateBarrier();
 	void DrawAttack(const Camera& camera);
@@ -85,10 +92,16 @@ private:
 	void DrawMagma(const Camera& camera);
 	void DrawFlame(const Camera& camera, bool isWarning) const;
 
+	static const int kMaxMagma = 30;
+	static constexpr float kFlameRange = 240.0f;
+	static constexpr float kFlameHalfAngle = 0.4f;
+
 	Vector2 moveTarget_ = {};
 	float moveSpeed_ = 2.0f;
+	float flameAngle_ = 0.0f;
 	int moveTimer_ = 0;
 
+	FlameCircle GetFlameCircle(int row, int Iane) const;
 	BeamData beam_;
 	StateData state_;
 	BarrierData barrier_;
