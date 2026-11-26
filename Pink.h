@@ -29,6 +29,8 @@ private:
 		Stunned
 	};
 
+	static const int kMaxMagma = 30;
+
 	//状態を管理する構造体
 	struct StateData {
 		State current = State::Hover;
@@ -42,10 +44,25 @@ private:
 		int animationTimer = 0;
 	};
 
-	struct BeamDate {
+	struct BeamData {
 		Vector2 direction = { 0.0f,1.0f };
 		float length = 2000.0f;
 		int halfWidth = 12;
+	};
+
+	struct MagmaData {
+		Vector2 position = {};
+		Vector2 velocity = {};
+
+		float landingY = 0.0f;
+		float radius = 24.0f;
+		float gravity = 0.35f;
+
+		int remainTimer = 0;
+
+		bool isActive = false;
+		bool isLanded = false;
+
 	};
 
 	void ChangeState(State nextState);
@@ -56,12 +73,16 @@ private:
 	void UpdateState(Vector2 playerPosition);
 	void UpdateMovement();
 	void SelectMoveTarget();
+	void SpawnMagma(Vector2 playerPosition);
+	void UpdateMagma();
+	void DrawMagma(const Camera& camera);
 
 	Vector2 moveTarget_ = {};
 	float moveSpeed_ = 2.0f;
 	int moveTimer_ = 0;
 
-	BeamDate beam_;
+	BeamData beam_;
 	StateData state_;
 	BarrierData barrier_;
+	MagmaData magma_[kMaxMagma];
 };
