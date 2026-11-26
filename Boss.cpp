@@ -54,13 +54,6 @@ void Boss::Update(bool canUseCommonAttack) {
 		}
 	}
 
-	//全方位弾発射の時間を減らす
-	attackTimer_.Update();
-	if (attackTimer_.IsFinishes()) {
-		FireRadialBullets();
-		attackTimer_.Start(120);
-	}
-
 	//発射済みの弾は、特殊攻撃中でも移動させる
 	for (int i = 0;i < kMaxBullets;i++) {
 		if (!bullets_[i].isActive) {

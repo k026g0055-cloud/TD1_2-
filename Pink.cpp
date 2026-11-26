@@ -24,7 +24,6 @@ Pink::Pink() {
 
 void Pink::Update(Vector2 playerPosition) {
 
-	UpdateState(playerPosition);
 	UpdateMovement();
 	UpdateMagma();
 
@@ -418,9 +417,11 @@ void Pink::DrawAttack(const Camera& camera) {
 		break;
 	}
 	case State::FlameWarning:
+		Novice::ScreenPrintf(10, 80, "Boss State : FlameWarning");
 		DrawFlame(camera, true);
 		break;
 	case State::FlameThrower:
+		Novice::ScreenPrintf(10, 80, "Boss State : FlameThrower");
 		DrawFlame(camera, false);
 		break;
 	case State::Strike:
@@ -498,7 +499,7 @@ void Pink::DrawFlame(const Camera& camera, bool isWarning) const {
 		for (int lane = -2;lane <= 2;++lane) {
 			const float offset = halfWidth * static_cast<float>(lane) / 2.0f;
 			const float x = origin.x + forwardx * distance - forwardy * offset;
-			const float y = origin.y = forwardy * distance + forwardx * offset;
+			const float y = origin.y + forwardy * distance + forwardx * offset;
 
 			//円の大きさをずらして炎を揺らす
 			const int radius = 16 + row + (state_.timer + row * 3 + lane + 2) % 5;
