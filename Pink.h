@@ -29,7 +29,7 @@ private:
 		Stunned
 	};
 
-	static const int kMaxMagma = 10;
+	static const int kMaxMagma = 30;
 
 	//状態を管理する構造体
 	struct StateData {

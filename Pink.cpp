@@ -106,15 +106,15 @@ void Pink::SpawnMagma(Vector2 playerPosition) {
 			magma_[i].position = bossPosition;
 
 			magma_[i].velocity = {
-				velocityX[shot],
-				velocityY[shot]
+				velocityX[shot]+randomVelocityX,
+				velocityY[shot]+randomVelocityY
 			};
 
 			magma_[i].landingY = landingY;
 
 			magma_[i].radius = 24.0f;
 			magma_[i].gravity = 0.35f;
-			magma_[i].remainTimer = 180;
+			magma_[i].remainTimer = 360;
 			magma_[i].isActive = true;
 			magma_[i].isLanded = false;
 
