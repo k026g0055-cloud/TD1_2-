@@ -5,16 +5,65 @@
 #include <Novice.h>
 #include <math.h>
 
+#include<Xinput.h>
+#pragma comment(lib, "Xinput.lib")
+
 void Player::Initialize()
 {
 	position_ = { 640.0f, 360.0f };
 	size_ = { 48.0f, 48.0f };
 	direction_ = { 0.0f, 1.0f };
+    hp_ = 5;
+    state_ = NORMAL;
+    attackTimer_.Reset();
+    attackDamage_ = 0;
+    isAttackActive = false;
+    hasAttackHit_ = false;
+    attackSize = { 0.0f,0.0f };
+    attackPosition = { 0.0f,0.0f };
 
 	speed_ = 5.0f;
 }
 
 void Player::Update(const InputManager& input, const Map& map)
+{
+    switch (state_)
+    {
+    case Player::NORMAL: 
+    {
+        UpdateMove(input, map);
+        if (input.IsButtonTrigger(XINPUT_GAMEPAD_A))
+        {
+            state_ = ATTACK_A;
+            attackTimer_.Start(15);
+        }
+        else if(input.IsButtonTrigger(XINPUT_GAMEPAD_B))
+        {
+            state_ = ATTACK_B;
+            attackTimer_.Start(35);
+        }
+
+
+
+        break;
+    }
+    case Player::ATTACK_A:
+    {
+        UpdateAttackA();
+        break;
+    }
+      
+    case Player::ATTACK_B:
+    {
+        UpdateAttackB();
+        break;
+    }
+    }
+}
+
+
+
+void Player::UpdateMove(const InputManager& input, const Map& map)
 {
     // 移動方向
     Vector2 move = input.GetMoveDirection();
@@ -130,6 +179,26 @@ void Player::Draw(const Camera& camera) const
 	);
 }
 
+void Player::UpdateAttackA()
+{
+    attackTimer_.Update();
+
+    if (attackTimer_.IsFinishes())
+    {
+        state_ = NORMAL;
+    }
+}
+
+void Player::UpdateAttackB()
+{
+    attackTimer_.Update();
+
+    if (attackTimer_.IsFinishes())
+    {
+        state_ = NORMAL;
+    }
+}
+
 Vector2 Player::GetPosition() const
 {
 	return position_;
@@ -142,4 +211,6 @@ void Player::SetPosition(Vector2 position) {
 void Player::Debug()
 {
 	Novice::ScreenPrintf(10, 30, "position {%.2f : %.2f}", position_.x, position_.y);
+    Novice::ScreenPrintf(10, 70, "State : %d", static_cast<int>(state_));
+    Novice::ScreenPrintf(10, 90, "AttackTimer : %d", attackTimer_.GetElapsed());
 }
