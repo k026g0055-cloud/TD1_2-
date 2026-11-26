@@ -44,7 +44,7 @@ private:
 		int animationTimer = 0;
 	};
 
-	struct BeamDate {
+	struct BeamData {
 		Vector2 direction = { 0.0f,1.0f };
 		float length = 2000.0f;
 		int halfWidth = 12;
@@ -81,7 +81,7 @@ private:
 	float moveSpeed_ = 2.0f;
 	int moveTimer_ = 0;
 
-	BeamDate beam_;
+	BeamData beam_;
 	StateData state_;
 	BarrierData barrier_;
 	MagmaData magma_[kMaxMagma];
