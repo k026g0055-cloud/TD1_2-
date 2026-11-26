@@ -149,14 +149,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 					kBossMapWidth * kTileSize / 2.0f,
 					kBossMapHeight * kTileSize - 100.0f
 					});
+				pink = Pink{};
 				currentSceen = PINK;
 				break;
 
 			}
 
 			player.Debug();
-			map.Debug(camera);
 			camera.Update(player.GetPosition());
+			map.Debug(camera);
 			player.Draw(camera);
 
 			break;
