@@ -29,12 +29,14 @@ private:
 		Magma,
 		BeamWarning,
 		Beam,
+		FlameWarning,
 		FlameThrower,
 		Strike,
 		Stunned
 	};
 
 	static const int kMaxMagma = 30;
+	float flameAngle_ = 0.0f;
 
 	//状態を管理する構造体
 	struct StateData {
@@ -81,6 +83,7 @@ private:
 	void SpawnMagma(Vector2 playerPosition);
 	void UpdateMagma();
 	void DrawMagma(const Camera& camera);
+	void DrawFlame(const Camera& camera, bool isWarning) const;
 
 	Vector2 moveTarget_ = {};
 	float moveSpeed_ = 2.0f;
