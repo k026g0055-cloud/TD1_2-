@@ -42,13 +42,13 @@ void Boss::Update(bool canUseCommonAttack) {
 	//Hover中だけワープと全方位弾を更新
 	if (canUseCommonAttack) {
 		warpTimer_.Update();
-		if (warpTimer_ .IsFinishes()< -0) {
+		if (warpTimer_ .IsFinishes()) {
 			Warp();
 			warpTimer_.Start(randomFrame(5, 9));
 		}
 
 		attackTimer_.Update();
-		if (attackTimer_.IsFinishes() <= 0) {
+		if (attackTimer_.IsFinishes()) {
 			FireRadialBullets();
 			attackTimer_.Start(randomFrame(4, 7));
 		}
