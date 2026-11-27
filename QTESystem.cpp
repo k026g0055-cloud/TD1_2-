@@ -180,25 +180,25 @@
 		const InputManager& input) const
 	{
 		if (input.IsButtonTrigger(XINPUT_GAMEPAD_A) ||
-			input.IsKeyTrigger(DIK_J))
+			input.IsKeyTrigger(DIK_DOWN))
 		{
 			return CMD_A;
 		}
 
 		if (input.IsButtonTrigger(XINPUT_GAMEPAD_B) ||
-			input.IsKeyTrigger(DIK_K))
+			input.IsKeyTrigger(DIK_RIGHT))
 		{
 			return CMD_B;
 		}
 
 		if (input.IsButtonTrigger(XINPUT_GAMEPAD_X) ||
-			input.IsKeyTrigger(DIK_U))
+			input.IsKeyTrigger(DIK_LEFT))
 		{
 			return CMD_X;
 		}
 
 		if (input.IsButtonTrigger(XINPUT_GAMEPAD_Y) ||
-			input.IsKeyTrigger(DIK_I))
+			input.IsKeyTrigger(DIK_UP))
 		{
 			return CMD_Y;
 		}
@@ -741,7 +741,7 @@
 		return state_ == QTE_FAILED;
 	}
 
-	// 操作方式取得
+	// 操作方式取得ぇ
 	QTEMode QTESystem::GetMode() const
 	{
 		return mode_;
