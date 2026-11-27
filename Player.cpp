@@ -226,7 +226,6 @@ void Player::UpdateAttackA()
         isAttackActive = false;
     }
 
-    if (attackTimer_.IsFinishes())
     if (attackTimer_.IsFinished())
     {
         state_ = NORMAL;
@@ -251,7 +250,6 @@ void Player::UpdateAttackB()
     }
 
 
-    if (attackTimer_.IsFinishes())
     if (attackTimer_.IsFinished())
     {
         state_ = NORMAL;
