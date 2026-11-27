@@ -185,19 +185,19 @@ void QTESystem::SetupCommands()
 		}
 
 	if (input.IsButtonTrigger(XINPUT_GAMEPAD_B) ||
-		input.IsKeyTrigger(DIK_K))
+		input.IsKeyTrigger(DIK_RIGHT))
 	{
 		return CMD_B;
 	}
 
 	if (input.IsButtonTrigger(XINPUT_GAMEPAD_X) ||
-		input.IsKeyTrigger(DIK_U))
+		input.IsKeyTrigger(DIK_LEFT))
 	{
 		return CMD_X;
 	}
 
 	if (input.IsButtonTrigger(XINPUT_GAMEPAD_Y) ||
-		input.IsKeyTrigger(DIK_I))
+		input.IsKeyTrigger(DIK_UP))
 	{
 		return CMD_Y;
 	}
