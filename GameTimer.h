@@ -30,7 +30,7 @@ public:
 	}
 
 	//残り時間が0ならtrueを返す
-	bool IsFinishes() const {
+	bool IsFinished() const {
 		return GetRemaining() == 0;
 	}
 private:
