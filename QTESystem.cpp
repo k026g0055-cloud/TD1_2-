@@ -179,7 +179,7 @@ void QTESystem::SetupCommands()
 		const InputManager& input) const
 	{
 		if (input.IsButtonTrigger(XINPUT_GAMEPAD_A) ||
-			input.IsKeyTrigger(DIK_J))
+			input.IsKeyTrigger(DIK_DOWN))
 		{
 			return CMD_A;
 		}

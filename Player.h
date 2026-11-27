@@ -18,6 +18,7 @@ public:
 	void Debug();
 	void UpdateAttackA();
 	void UpdateAttackB();
+	void UpdateAttackPosition();
 
 private:
 

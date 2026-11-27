@@ -32,19 +32,27 @@ void Player::Update(const InputManager& input, const Map& map)
     case Player::NORMAL: 
     {
         UpdateMove(input, map);
+
         if (input.IsButtonTrigger(XINPUT_GAMEPAD_A))
         {
             state_ = ATTACK_A;
             attackTimer_.Start(15);
+
+            attackDamage_ = 10;
+            attackSize = { 48.0f,48.0f };
+            isAttackActive = false;
+            hasAttackHit_ = false;
         }
         else if(input.IsButtonTrigger(XINPUT_GAMEPAD_B))
         {
             state_ = ATTACK_B;
             attackTimer_.Start(35);
+
+            attackDamage_ = 20;
+            attackSize = { 60.0f,60.0f };
+            isAttackActive = false;
+            hasAttackHit_ = false;
         }
-
-
-
         break;
     }
     case Player::ATTACK_A:
@@ -177,15 +185,52 @@ void Player::Draw(const Camera& camera) const
 		static_cast<int>(screenPosition.y + direction_.y * 40.0f),
 		WHITE
 	);
+
+    if (isAttackActive)
+    {
+        Vector2 screenAttackPosition =
+            camera.WorldToScreen(attackPosition);
+
+        // 攻撃判定の左上の座標を計算
+
+        float attackDrawX = screenAttackPosition.x - attackSize.x / 2.0f;
+        float attackDrawY = screenAttackPosition.y - attackSize.y / 2.0f;
+
+        // DrawBoxで攻撃判定を描画
+        Novice::DrawBox(
+            static_cast<int>(attackDrawX),
+            static_cast<int>(attackDrawY),
+            static_cast<int>(attackSize.x),
+            static_cast<int>(attackSize.y),
+            0.0f, RED, kFillModeWireFrame
+        );
+
+    }
+
+
 }
 
 void Player::UpdateAttackA()
 {
     attackTimer_.Update();
 
+    int elapsed = attackTimer_.GetElapsed();
+
+    if (elapsed >= 3 && elapsed < 8)
+    {
+        isAttackActive = true;
+        UpdateAttackPosition();
+    }
+    else
+    {
+        isAttackActive = false;
+    }
+
+    if (attackTimer_.IsFinishes())
     if (attackTimer_.IsFinished())
     {
         state_ = NORMAL;
+        isAttackActive = false;
     }
 }
 
@@ -193,15 +238,39 @@ void Player::UpdateAttackB()
 {
     attackTimer_.Update();
 
+    int elapsed = attackTimer_.GetElapsed();
+
+    if (elapsed >= 10 && elapsed < 20)
+    {
+        isAttackActive = true;
+        UpdateAttackPosition();
+    }
+    else
+    {
+        isAttackActive = false;
+    }
+
+
+    if (attackTimer_.IsFinishes())
     if (attackTimer_.IsFinished())
     {
         state_ = NORMAL;
+        isAttackActive = false;
     }
 }
 
 Vector2 Player::GetPosition() const
 {
 	return position_;
+}
+
+void Player::UpdateAttackPosition()
+{
+    float distance = size_.x / 2.0f + attackSize.x / 2.0f;
+
+    attackPosition.x = position_.x + direction_.x * distance;
+    attackPosition.y = position_.y + direction_.y * distance;
+
 }
 
 void Player::SetPosition(Vector2 position) {
